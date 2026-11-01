@@ -1,0 +1,34 @@
+{
+  "voice_id": "warm-informational",
+  "purpose": "House voice reference for fast, warm educational narration",
+  "source": "Real human speaker's voice, extracted from a third-party YouTube video and used as a dots.tts SOAR cloning reference",
+  "source_video": {
+    "title": "Cloudflare Just Deleted 100TB of Memory #cloudflare #dns #programming",
+    "channel": "Better Stack",
+    "url": "https://www.youtube.com/watch?v=KoziBW5p--c",
+    "clip_start_seconds": 38.15,
+    "clip_end_seconds": 51.02
+  },
+  "source_is_real_person": true,
+  "consent_status": "NOT obtained from the speaker or channel. Selected and installed at the explicit, informed direction of the project owner on 2026-09-03, who was told this is a real, identifiable person's voice from an unlicensed clip (not a synthetic or licensed sample) and accepted the associated impersonation/rights/platform-policy risk before authorizing use.",
+  "risk_notes": [
+    "No license or consent obtained for voice likeness or the underlying clip.",
+    "Right-of-publicity / personality-rights exposure for the speaker and channel (Better Stack).",
+    "Potential conflict with YouTube's synthetic-media / impersonation policies.",
+    "Separate copyright exposure from reusing audio lifted from another creator's monetized video."
+  ],
+  "sample_rate_hz": 48000,
+  "channels": 1,
+  "duration_seconds": 12.87,
+  "processing": [
+    "Extracted from source video 38.15s-51.02s at a clean sentence boundary with no clipping or overlapping speech",
+    "Downmixed to mono, resampled to 48kHz",
+    "PCM 24-bit",
+    "No pitch or tempo alteration applied to the reference clip itself"
+  ],
+  "tempo_or_pitch_processing": false,
+  "effects": [],
+  "asr_verification": "faster-whisper small.en transcript matches transcript_file verbatim; used as the dots.tts SOAR prompt_text",
+  "transcript_file": "warm-informational.txt",
+  "superseded_reference": "archive-superseded-20260903/ (previous prompt-free synthetic SOAR house voice, see archive-superseded-20260903/provenance.json)"
+}

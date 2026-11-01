@@ -1,5 +1,7 @@
-# Credits and License Ledger - {{NAME}}
-Every external asset gets a row the moment it enters the repo. CC0 preferred. Anything else needs its credit line here.
+# Credits and Licence Ledger - {{NAME}}
+Every external asset (model, texture, sound, music, font, library, tool output) gets a row the moment it enters the repo.
+The licence floor was chosen with the user: <<FILL>>. Read the licence on the asset's own page. Anything outside the floor needs the user's logged approval.
+The in-game credits screen and the store text are generated from this file (references/release-and-legal.md).
 
-| Asset | Source (URL) | License | Author | Used in |
-|-------|--------------|---------|--------|---------|
+| Asset (title as on its page) | Author | Source URL | Licence | Date read | Path in project | Used in |
+|---|---|---|---|---|---|---|

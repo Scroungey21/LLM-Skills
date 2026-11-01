@@ -1,0 +1,1198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.pipeline/schemas/stickman_scenario_storyboard.schema.json",
+  "title": "Stickman Real-Scenario Storyboard Schema v1.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_id",
+    "video_id",
+    "style_profile_id",
+    "script_hash",
+    "canvas",
+    "timeline",
+    "entities",
+    "locations",
+    "shots",
+    "quality_contract"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "video_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "style_profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "script_hash": {
+      "type": "string",
+      "minLength": 16
+    },
+    "evidence_packet_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height",
+        "fps",
+        "pixel_format"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 320
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 180
+        },
+        "fps": {
+          "type": "number",
+          "minimum": 12,
+          "maximum": 120
+        },
+        "pixel_format": {
+          "type": "string",
+          "enum": [
+            "rgba",
+            "rgb"
+          ]
+        }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "duration_sec",
+        "narration_track_id"
+      ],
+      "properties": {
+        "duration_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "narration_track_id": {
+          "type": "string"
+        },
+        "music_track_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/location"
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/assetDependency"
+      },
+      "default": []
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/shot"
+      }
+    },
+    "global_audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "narration_lufs_target": {
+          "type": "number"
+        },
+        "true_peak_max_dbtp": {
+          "type": "number"
+        },
+        "music_duck_db": {
+          "type": "number"
+        }
+      }
+    },
+    "quality_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_unresolved_continuity_errors",
+        "max_missing_asset_dependencies",
+        "required_gate_status"
+      ],
+      "properties": {
+        "max_unresolved_continuity_errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_missing_asset_dependencies": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "required_gate_status": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "PASS_WITH_WARNINGS"
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "vec2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_id",
+        "entity_type",
+        "canonical_asset_id",
+        "persistence_scope",
+        "default_state"
+      ],
+      "properties": {
+        "entity_id": {
+          "type": "string"
+        },
+        "entity_type": {
+          "type": "string",
+          "enum": [
+            "CHARACTER",
+            "ANIMAL",
+            "PROP",
+            "VEHICLE",
+            "UI_OBJECT",
+            "DIAGRAM_OBJECT",
+            "TEXT_OBJECT"
+          ]
+        },
+        "semantic_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "canonical_asset_id": {
+          "type": "string"
+        },
+        "persistence_scope": {
+          "type": "string",
+          "enum": [
+            "SHOT",
+            "SCENARIO",
+            "VIDEO",
+            "SERIES"
+          ]
+        },
+        "identity_lock": {
+          "type": "boolean",
+          "default": true
+        },
+        "default_state": {
+          "$ref": "#/$defs/entityState"
+        },
+        "allowed_pose_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+    "entityState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visible",
+        "location_id",
+        "position",
+        "scale",
+        "rotation_deg",
+        "facing",
+        "pose_id",
+        "z_index",
+        "attachments"
+      ],
+      "properties": {
+        "visible": {
+          "type": "boolean"
+        },
+        "location_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "position": {
+          "$ref": "#/$defs/vec2"
+        },
+        "scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rotation_deg": {
+          "type": "number"
+        },
+        "facing": {
+          "type": "string",
+          "enum": [
+            "LEFT",
+            "RIGHT",
+            "FRONT",
+            "BACK",
+            "THREE_QUARTER_LEFT",
+            "THREE_QUARTER_RIGHT",
+            "NA"
+          ]
+        },
+        "pose_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "emotion_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "z_index": {
+          "type": "integer"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "asset_id",
+              "anchor"
+            ],
+            "properties": {
+              "asset_id": {
+                "type": "string"
+              },
+              "anchor": {
+                "type": "string",
+                "enum": [
+                  "LEFT_HAND",
+                  "RIGHT_HAND",
+                  "HEAD",
+                  "TORSO",
+                  "BACK",
+                  "CUSTOM"
+                ]
+              },
+              "custom_anchor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "location_id",
+        "location_type",
+        "background_asset_id",
+        "layout_slots"
+      ],
+      "properties": {
+        "location_id": {
+          "type": "string"
+        },
+        "location_type": {
+          "type": "string",
+          "enum": [
+            "REAL_SCENARIO",
+            "ABSTRACT_STAGE",
+            "DIAGRAM_SPACE",
+            "UI_SPACE",
+            "MONTAGE_SPACE"
+          ]
+        },
+        "semantic_label": {
+          "type": "string"
+        },
+        "background_asset_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "layout_slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "slot_id",
+              "position"
+            ],
+            "properties": {
+              "slot_id": {
+                "type": "string"
+              },
+              "position": {
+                "$ref": "#/$defs/vec2"
+              },
+              "facing_hint": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "assetDependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset_id",
+        "asset_class",
+        "representation",
+        "strategy",
+        "status"
+      ],
+      "properties": {
+        "asset_id": {
+          "type": "string"
+        },
+        "asset_class": {
+          "type": "string",
+          "enum": [
+            "CHARACTER",
+            "POSE",
+            "ANIMAL",
+            "PROP",
+            "BACKGROUND",
+            "ICON",
+            "DIAGRAM",
+            "TEXTURE",
+            "THUMBNAIL_ELEMENT",
+            "SFX",
+            "MUSIC"
+          ]
+        },
+        "representation": {
+          "type": "string",
+          "enum": [
+            "SVG",
+            "PARAMETRIC_VECTOR",
+            "PNG_RGBA",
+            "PNG_RGB",
+            "WEBP",
+            "AUDIO",
+            "PROCEDURAL",
+            "COMFY_OUTPUT"
+          ]
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "SEARCH_REUSE",
+            "REUSE_MODIFY",
+            "PROCEDURAL_GENERATE",
+            "COMFY_T2I",
+            "COMFY_I2I",
+            "COMFY_INPAINT",
+            "MANUAL_IMPORT"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PLANNED",
+            "FOUND",
+            "GENERATED",
+            "VALIDATED",
+            "FAILED"
+          ]
+        },
+        "source_asset_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "artifact_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "provenance_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "timeRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_sec",
+        "end_sec"
+      ],
+      "properties": {
+        "start_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "framing",
+        "center",
+        "zoom",
+        "rotation_deg"
+      ],
+      "properties": {
+        "framing": {
+          "type": "string",
+          "enum": [
+            "EXTREME_WIDE",
+            "WIDE",
+            "MEDIUM_WIDE",
+            "MEDIUM",
+            "MEDIUM_CLOSE",
+            "CLOSE",
+            "EXTREME_CLOSE",
+            "TOP_DOWN",
+            "SPLIT",
+            "DIAGRAM",
+            "UI"
+          ]
+        },
+        "center": {
+          "$ref": "#/$defs/vec2"
+        },
+        "zoom": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rotation_deg": {
+          "type": "number"
+        },
+        "safe_margins_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 40,
+          "default": 5
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "layer_id",
+        "source_type",
+        "source_id",
+        "z_index",
+        "transform",
+        "opacity"
+      ],
+      "properties": {
+        "layer_id": {
+          "type": "string"
+        },
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "ENTITY",
+            "ASSET",
+            "TEXT",
+            "SHAPE",
+            "MASK",
+            "PARTICLE_EMITTER"
+          ]
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "z_index": {
+          "type": "integer"
+        },
+        "transform": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "position",
+            "scale",
+            "rotation_deg"
+          ],
+          "properties": {
+            "position": {
+              "$ref": "#/$defs/vec2"
+            },
+            "scale": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "rotation_deg": {
+              "type": "number"
+            }
+          }
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "animationEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "target_id",
+        "property",
+        "time",
+        "interpolation",
+        "from",
+        "to"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string"
+        },
+        "target_id": {
+          "type": "string"
+        },
+        "property": {
+          "type": "string",
+          "enum": [
+            "POSITION",
+            "SCALE",
+            "ROTATION",
+            "OPACITY",
+            "POSE",
+            "EMOTION",
+            "CAMERA_CENTER",
+            "CAMERA_ZOOM",
+            "PATH_PROGRESS",
+            "MASK_REVEAL",
+            "TEXT_REVEAL",
+            "SHAKE",
+            "DRAW_PROGRESS"
+          ]
+        },
+        "time": {
+          "$ref": "#/$defs/timeRange"
+        },
+        "interpolation": {
+          "type": "string",
+          "enum": [
+            "STEP",
+            "LINEAR",
+            "EASE_IN",
+            "EASE_OUT",
+            "EASE_IN_OUT",
+            "SPRING",
+            "CUSTOM_BEZIER"
+          ]
+        },
+        "from": {},
+        "to": {},
+        "bezier": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "target_component": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional stable sub-component path within target entity, e.g. head or body. Use when animation/constraint affects only part of a rig."
+        }
+      }
+    },
+    "audioEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "event_type",
+        "start_sec",
+        "gain_db"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string"
+        },
+        "event_type": {
+          "type": "string",
+          "enum": [
+            "SFX",
+            "MUSIC_CUE",
+            "MUSIC_DUCK",
+            "SILENCE_BEAT",
+            "NARRATION_EMPHASIS"
+          ]
+        },
+        "asset_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "start_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "duration_sec": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "gain_db": {
+          "type": "number"
+        },
+        "sync_target_event_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "statePatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "path"
+      ],
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "ADD",
+            "REPLACE",
+            "REMOVE"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "value": {}
+      }
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assertion_id",
+        "path",
+        "operator"
+      ],
+      "properties": {
+        "assertion_id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "EQ",
+            "NEQ",
+            "EXISTS",
+            "NOT_EXISTS",
+            "IN",
+            "NOT_IN",
+            "LTE",
+            "GTE"
+          ]
+        },
+        "value": {},
+        "severity": {
+          "type": "string",
+          "enum": [
+            "ERROR",
+            "WARNING"
+          ],
+          "default": "ERROR"
+        }
+      }
+    },
+    "shot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shot_id",
+        "scenario_id",
+        "beat_ids",
+        "time",
+        "narration",
+        "narrative_function",
+        "scene_operation",
+        "scene_type",
+        "location_id",
+        "continuity",
+        "camera",
+        "layers",
+        "animation_events",
+        "audio_events",
+        "asset_dependencies",
+        "generation_policy",
+        "retention_function",
+        "source_claim_ids",
+        "qa_assertions"
+      ],
+      "properties": {
+        "shot_id": {
+          "type": "string"
+        },
+        "scenario_id": {
+          "type": "string"
+        },
+        "beat_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "time": {
+          "$ref": "#/$defs/timeRange"
+        },
+        "narration": {
+          "type": "string"
+        },
+        "narrative_function": {
+          "type": "string",
+          "enum": [
+            "HOOK",
+            "QUESTION",
+            "SETUP",
+            "MECHANISM",
+            "EVIDENCE",
+            "EXAMPLE",
+            "COMPARISON",
+            "ESCALATION",
+            "COUNTERPOINT",
+            "TWIST",
+            "PAYOFF",
+            "CALLBACK",
+            "CTA",
+            "BRIDGE"
+          ]
+        },
+        "scene_operation": {
+          "type": "string",
+          "enum": [
+            "NEW_SCENARIO",
+            "CONTINUE_SCENARIO",
+            "MUTATE_SCENARIO",
+            "CAMERA_CUT",
+            "INSERT_EXPLAINER",
+            "OVERLAY_ONLY",
+            "MONTAGE",
+            "HOLD",
+            "CALLBACK"
+          ]
+        },
+        "scene_type": {
+          "type": "string",
+          "enum": [
+            "REAL_WORLD_SCENARIO",
+            "CHARACTER_INTERACTION",
+            "OBJECT_DEMONSTRATION",
+            "EXPLANATORY_DIAGRAM",
+            "CAUSE_EFFECT_CHAIN",
+            "COMPARISON_SPLIT",
+            "HISTORICAL_VIGNETTE",
+            "LOCATION_ESTABLISHER",
+            "BODY_MECHANISM",
+            "RESEARCH_ATTRIBUTION",
+            "VISUAL_METAPHOR",
+            "EXCEPTION_MONTAGE",
+            "TEXT_STAT_EMPHASIS",
+            "REACTION",
+            "CALLBACK"
+          ]
+        },
+        "location_id": {
+          "type": "string"
+        },
+        "continuity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "continuity_from_shot_id",
+            "preconditions",
+            "state_patch",
+            "must_persist_entity_ids"
+          ],
+          "properties": {
+            "continuity_from_shot_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "preconditions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/assertion"
+              }
+            },
+            "state_patch": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/statePatch"
+              }
+            },
+            "must_persist_entity_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "allow_discontinuity_reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "camera": {
+          "$ref": "#/$defs/camera"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/layer"
+          }
+        },
+        "animation_events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/animationEvent"
+          }
+        },
+        "audio_events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/audioEvent"
+          }
+        },
+        "text_elements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text_id",
+              "content",
+              "role",
+              "start_sec",
+              "end_sec"
+            ],
+            "properties": {
+              "text_id": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "LABEL",
+                  "NUMBER",
+                  "QUOTE_FRAGMENT",
+                  "SECTION_WORD",
+                  "CAPTION",
+                  "WARNING"
+                ]
+              },
+              "start_sec": {
+                "type": "number"
+              },
+              "end_sec": {
+                "type": "number"
+              },
+              "style_token": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "default": []
+        },
+        "asset_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "generation_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "preferred_method",
+            "fallback_methods",
+            "seed_policy",
+            "max_attempts",
+            "cache_key_inputs"
+          ],
+          "properties": {
+            "preferred_method": {
+              "type": "string",
+              "enum": [
+                "VECTOR_REUSE",
+                "VECTOR_PROCEDURAL",
+                "RASTER_REUSE",
+                "COMFY_T2I",
+                "COMFY_I2I",
+                "COMFY_INPAINT",
+                "NONE"
+              ]
+            },
+            "fallback_methods": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "VECTOR_REUSE",
+                  "VECTOR_PROCEDURAL",
+                  "RASTER_REUSE",
+                  "COMFY_T2I",
+                  "COMFY_I2I",
+                  "COMFY_INPAINT",
+                  "NONE"
+                ]
+              }
+            },
+            "workflow_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "seed_policy": {
+              "type": "string",
+              "enum": [
+                "FIXED_PER_ASSET",
+                "FIXED_PER_ENTITY",
+                "ROTATE_ON_RETRY",
+                "NA"
+              ]
+            },
+            "max_attempts": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 8
+            },
+            "cache_key_inputs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "retention_function": {
+          "type": "string",
+          "enum": [
+            "ORIENT",
+            "CURIOSITY",
+            "ESCALATE",
+            "CLARIFY",
+            "SURPRISE",
+            "HUMOR",
+            "RESET_ATTENTION",
+            "PAYOFF",
+            "NONE"
+          ]
+        },
+        "source_claim_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "qa_assertions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assertion"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/componentConstraint"
+          },
+          "default": [],
+          "description": "Timed world/component constraints evaluated by the animation compiler, e.g. lock a pigeon head in world space while its body advances."
+        }
+      }
+    },
+    "componentConstraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint_id",
+        "target_id",
+        "target_component",
+        "kind",
+        "time",
+        "space"
+      ],
+      "properties": {
+        "constraint_id": {
+          "type": "string"
+        },
+        "target_id": {
+          "type": "string"
+        },
+        "target_component": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "LOCK_POSITION",
+            "LOCK_X",
+            "LOCK_Y",
+            "FOLLOW",
+            "LOOK_AT",
+            "MAINTAIN_DISTANCE",
+            "ATTACH",
+            "DETACH"
+          ]
+        },
+        "time": {
+          "$ref": "#/$defs/timeRange"
+        },
+        "space": {
+          "type": "string",
+          "enum": [
+            "WORLD",
+            "LOCATION",
+            "SCREEN",
+            "PARENT"
+          ]
+        },
+        "reference_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reference_component": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {},
+        "tolerance": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

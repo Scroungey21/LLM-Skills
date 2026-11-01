@@ -3,7 +3,7 @@
 Read at Phase 2 (Toolchain) for any UE5 project. Facts marked **verify** were not confirmed against current official terms.
 
 Pin: **Unreal Engine 5.8** (released June 2026; the companion skills are written against it). UE licensing: free to use with a royalty above a revenue threshold set by Epic:
-**verify** current terms against the $0 rule before starting.
+**verify** current terms against the user's budget before starting.
 
 ## Contents
 1. Editor control (MCP)
@@ -26,7 +26,7 @@ Pin: **Unreal Engine 5.8** (released June 2026; the companion skills are written
 | **ATDev UEMCP (PyPI `uemcp`)** | Uses UE's **built-in Python remote execution**: nothing to compile or install in the project | Free; works on vanilla UE 5.0 to 5.6 | `claude mcp add unreal -- uvx uemcp`. 29 dedicated tools plus a raw `ue_python` escape hatch. Treat it like giving the agent the editor's Python console: use source control |
 | GenOrca/unreal-mcp | C++/Python plugin | UE 5.6+; check the repo's license | Strong on Blueprint graphs, Behavior Trees, UMG widgets, materials, cinematics |
 | IvanMurzak/Unreal-MCP | C++ plugin from Fab + a shared engine-agnostic server | Free, but **defaults to a hosted cloud backend** (ai-game.dev) unless you self-host | Cloud dependency: avoid unless self-hosted |
-| Ludus AI, Fab "Claude Assistant" | Commercial | Paid | **Rejected: breaks $0** |
+| Ludus AI, Fab "Claude Assistant" | Commercial | Paid | **Only with the user's approval of the cost** |
 
 Install (default): follow the ChiR24 wiki ("About ten minutes from an empty project"): install the plugin into the project, enable it, open the editor, then point the MCP client at `http://localhost:3000/mcp` or the npm bridge. Record the exact steps in `TOOLCHAIN.md`.
 
@@ -44,12 +44,12 @@ claude plugin install unreal@awesome-gamedev-agent-skills
 ```
 | Workflow phase | Unreal skills | Cross-engine skills |
 |---|---|---|
-| 3 Style | `unreal-niagara` (effects), materials via `ue5-mcp` | `create-game-assets`, `shader-programming` |
+| 3 Look | `unreal-niagara` (effects), materials via `ue5-mcp` | `create-game-assets`, `shader-programming` |
 | 4 Skeleton | `unreal-cpp-gameplay`, `unreal-blueprints`, `unreal-enhanced-input` | `input-systems`, `game-ui-ux` |
 | 5 Vertical slice | `unreal-cpp-gameplay`, `unreal-niagara` | `game-feel`, `camera-systems`, `level-design`, genre skill |
 | 6 Content | `unreal-behavior-trees` (AI) | `save-systems`, `game-ai`, `procedural-gen`, `audio-design` |
 | 7 Hardening | (Automation, see section 6) | `physics-tuning`, `performance-optimization` |
-| 8 Release | `unreal-packaging` | `itch-publish` / `steam-publish` |
+| 8 Release and handover | `unreal-packaging` | `itch-publish` / `steam-publish` |
 
 **Gaps:** the catalog has **no Unreal networking skill** and no UE testing skill. Use Epic's replication documentation and section 5 below.
 
@@ -62,23 +62,23 @@ Whichever is chosen, the folder, seam and header-comment rules still apply (see 
 ## 4. Assets
 - **Fab** (successor to the Unreal Marketplace, Sketchfab Store and Quixel): Standard License is stated by Epic to work in any engine, but a third-party summary claims some free Megascans use is limited to Unreal: **read each asset's license**. The full free Megascans library ended 2024-12-31; a permanent free starter pack (over 1,500 assets) and a rotating free drop every two weeks remain.
 - CC0 packs (Kenney, Quaternius, KayKit) import as FBX or glTF (Interchange).
-- Blender MCP as in `tools-general.md`. Style gate: one master material with a palette texture and a Lineup level `/Game/_Lineup`.
-- Prefer stylized low-poly. Nanite, Lumen and Megascans-scale realism are the opposite of "simple and goofy" and cost performance on integrated graphics: switch them off unless the vision needs them.
+- Blender MCP as in `tools-general.md`. Look gate: materials per `ART_DIRECTION.md` and a Lineup level `/Game/_Lineup`.
+- Nanite, Lumen and Megascans-scale realism cost performance on weaker hardware: enable them when the art direction needs them and the reference machine can afford them (`performance.md`).
 
 ## 5. Networking and voice
 - **Built in and free:** the replication framework (Actors, RPCs, `GameMode`/`GameState`/`PlayerState`), listen server, Online Subsystem Null for LAN. Host-authoritative is the engine's native model (the server owns the truth), so the standard's authority rules map directly.
-- **Epic Online Services (EOS):** free-to-use SDK for sessions, P2P and voice (**verify** current terms): the standard $0 route past NAT.
+- **Epic Online Services (EOS):** free-to-use SDK for sessions, P2P and voice (**verify** current terms): a common route past NAT without running your own servers.
 - Voice: EOS Voice (**verify**), or ODIN by 4Players which has a sample project (pricing **unverified**). Fallback: Discord plus a speaking indicator.
 - No networking skill exists in the catalog: read Epic's networking docs (Actor replication, RPCs, relevancy).
 
 ## 6. Testing and gates
-- **G1 Boots:** build the editor target, then launch headless: `UnrealEditor-Cmd <project>.uproject -unattended -nullrhi -ExecCmds="quit"` and scan the log for `Error:` (**verify** flags for 5.8).
-- **G3 Logic tests:** Automation Framework / Functional Tests, run with `-ExecCmds="Automation RunTests <Filter>; Quit"` (**verify**); Gauntlet for heavier orchestration.
-- **G2 Screenshot:** `HighResShot` console command or the MCP's screenshot tool.
-- **G4 Multiplayer:** launch the editor with 2+ clients (Play Settings: Number of Players, Net Mode "Play As Listen Server") plus a packaged two-machine test.
+- **G2 Boot:** build the editor target, then launch headless: `UnrealEditor-Cmd <project>.uproject -unattended -nullrhi -ExecCmds="quit"` and scan the log for `Error:` (**verify** flags for 5.8).
+- **G3 Unit tests:** Automation Framework / Functional Tests, run with `-ExecCmds="Automation RunTests <Filter>; Quit"` (**verify**); Gauntlet for heavier orchestration.
+- **G10 Screenshot (windowed):** `HighResShot` console command or the MCP's screenshot tool.
+- **G9 Multiplayer:** launch the editor with 2+ clients (Play Settings: Number of Players, Net Mode "Play As Listen Server") plus a packaged two-machine test.
 
 ## 7. Build and release
-`unreal-packaging` skill: cook and package (`RunUAT BuildCookRun`). itch.io via `butler` is the $0 path.
+`unreal-packaging` skill: cook and package (`RunUAT BuildCookRun`). itch.io via `butler` is a low-cost path.
 
 ## 8. Verdict summary
 **Adopt:** ChiR24/Unreal_mcp (or Epic's official plugin once stable), ibrews/ue5-mcp, awesome-gamedev-agent-skills (unreal + router), built-in replication, Fab free assets (license-checked).

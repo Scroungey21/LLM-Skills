@@ -1,0 +1,21 @@
+{
+  "_comment": "Starter values only. Replace with swatches proposed by palette_from_refs.py and approved by the art director. Tolerance is CIE Lab dE76; ramps are the light/dark steps Minecraft shading uses.",
+  "tolerance": 14,
+  "ramp_step": 7,
+  "ramp_steps": 2,
+  "global": {
+    "ink": "#1b1a17",
+    "dust": "#c9b99a",
+    "soot": "#3a3835",
+    "rust": "#8a4b2d",
+    "overgrowth": "#5d6b3a"
+  },
+  "districts": {
+    "example_district": {
+      "wall": "#e8dcc4",
+      "trim": "#b3563a",
+      "roof": "#9c6a4a",
+      "accent": "#2f6f8f"
+    }
+  }
+}

@@ -29,14 +29,14 @@ over the same connection and confuse the agent.
 | **Erodenn/godot-mcp-runtime** | Runtime bridge: injects a temporary TCP autoload to inspect the running game, auto-cleans | MIT, free, small | Add *beside* an editor server when you need to inspect a running game |
 | tugcantopaloglu/godot-mcp, satelliteoflove/godot-mcp | Runtime / debugger-protocol options | MIT, free | Alternatives to the line above |
 | **masteryee-labs/Open-Godot-MCP** | Deterministic playtesting, multiplayer testing, DAP debugging, LSP | MIT, free; `pip install open-godot-mcp` | Very new (July 2026) and its built-in vision/image tools call third-party APIs: treat as experimental, review before adopting |
-| Godot MCP Pro ($15), GDAI MCP ($19), StraySpark (commercial) | Polished paid servers | Paid | **Rejected: breaks $0** |
+| Godot MCP Pro, GDAI MCP, StraySpark (commercial) | Polished paid servers | Paid | Only with the user's approval of the cost |
 
 Install (default):
 ```
 claude mcp add godot -e GODOT_PATH=/path/to/godot -- npx @coding-solo/godot-mcp
 ```
 For the others follow each repository's README (commands change); record the exact command you used in `TOOLCHAIN.md`.
-No MCP at all still works: the scripts in `scripts/` run Godot headless from the command line (gates G1 and G4).
+No MCP at all still works: the scripts in `scripts/` (`gate.ps1`, `gate_boot.sh`, `net_test.sh`) run Godot headless from the command line (gates G1, G2, G9).
 
 ## 2. Knowledge skills to load per workflow phase
 
@@ -53,19 +53,19 @@ companion skills supply engine API detail only.
 
 | Workflow phase | Godot skills to load | Cross-engine skills to load |
 |---|---|---|
-| 3 Style | `godot-shaders`, `godot-3d-essentials` | `create-game-assets`, `shader-programming` |
+| 3 Look | `godot-shaders`, `godot-3d-essentials` | `create-game-assets`, `shader-programming` |
 | 4 Skeleton | `godot-gdscript`, `godot-nodes-scenes`, `godot-signals-groups`, `godot-multiplayer` (if online) | `input-systems`, `game-ui-ux` |
 | 5 Vertical slice | `godot-physics`, `godot-animation`, `godot-audio`, `godot-ui-control`, `godot-resources` | `game-feel`, `camera-systems`, `level-design`, `prototype-fast`, the matching genre skill |
 | 6 Content | `godot-resources`, `godot-tilemap` (2D) | `save-systems`, `game-ai`, `procedural-gen`, `audio-design` |
 | 7 Hardening | `godot-gdscript-headless-testing` | `physics-tuning`, `performance-optimization` |
-| 8 Release | `godot-export` | `itch-publish` or `steam-publish` |
+| 8 Release and handover | `godot-export` | `itch-publish` or `steam-publish` |
 
 Genre skills available: platformer, roguelike, rpg, fps-shooter, tower-defense, card-game, visual-novel, survival-crafting, puzzle.
-There is no racing or party-game genre skill: use `references/genres.md` for those. `godot-csharp` only if the project uses C#.
+There is no racing or social-game genre skill: use `references/genres.md` for those. `godot-csharp` only if the project uses C#.
 
 ## 3. Assets and Blender
 See `tools-general.md` for Blender MCP, free sources and licenses. Godot specifics: export `.glb`; use the `-col` / `-colonly` / `-convcolonly`
-import suffixes; one shared `ShaderMaterial` (template `assets/templates/toon.gdshader`); `Compatibility` renderer for web and low-end GPUs.
+import suffixes; materials and shaders follow `ART_DIRECTION.md`; `Compatibility` renderer for web and low-end GPUs. Headless Blender: `blender --background --factory-startup --python script.py -- args`.
 
 ## 4. Networking and voice
 
@@ -82,16 +82,16 @@ import suffixes; one shared `ShaderMaterial` (template `assets/templates/toon.gd
 | modcommunity/dot-voice | Pure GDScript | MIT: push-to-talk or voice activation, per-speaker jitter buffer, routing to all / team / proximity; codec is pluggable (no Opus in plain GDScript) |
 | one-voip-godot-4 | Superseded | Its own README points to TwoVoip |
 
-If none work in the target build, the $0 fallback is "players use Discord" plus an in-game visual speaking indicator. See `networking.md` section 11.
+If none work in the target build, the no-cost fallback is "players use an outside voice app" plus an in-game visual speaking indicator. See `networking.md` section 11.
 
 ## 5. Testing and gates
-- **G1/G4:** `scripts/gate_boot.sh`, `scripts/net_test.sh` (headless Godot, tested here on 4.7.1).
+- **G1, G2, G9:** `scripts/gate.ps1` (Windows) or `scripts/gate_boot.sh`, `scripts/net_test.sh` (headless Godot, tested on 4.7.2).
 - **G3:** GUT 9.x, `godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit`; skill `godot-gdscript-headless-testing` covers exit codes for CI.
-- **G2 (seeing the game):** the editor MCP's run/screenshot tools, or the one-line viewport capture in `qa.md`.
+- **G10 (seeing the game):** a windowed run with the editor MCP's run/screenshot tools, or the one-line viewport capture in `qa.md`. Never `--headless` for pixels.
 - Optional: Open-Godot-MCP for scripted playtests; gdmutant for mutation testing once tests exist.
 
 ## 6. Build and release
-Export presets committed in `export_presets.cfg`; headless export per `godot-export`. itch.io is the $0 distribution path (`butler`, skill `itch-publish`);
+Export presets committed in `export_presets.cfg`; headless export per `godot-export`. itch.io is a low-cost distribution path (`butler`, skill `itch-publish`);
 Steam has a one-time fee and is the user's call (`steam-publish`).
 
 ## 7. Verdict summary

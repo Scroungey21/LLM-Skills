@@ -1,0 +1,40 @@
+server:
+  host: 0.0.0.0
+  port: 8004
+  use_ngrok: false
+  use_auth: false
+  auth_username: user
+  auth_password: password
+  log_file_path: logs/tts_server.log
+  log_file_max_size_mb: 10
+  log_file_backup_count: 5
+model:
+  repo_id: dots-studio/dots.tts-soar
+tts_engine:
+  device: cuda:0
+  dtype: bfloat16
+  attention: sdpa
+  language: EN
+  default_voice_id: warm-informational
+  reference_audio: /app/voices/warm-informational.wav
+  reference_text: /app/voices/warm-informational.txt
+paths:
+  model_cache: model_cache
+  output: outputs
+generation_defaults:
+  seed: 20260829
+  num_steps: 16
+  guidance_scale: 1.2
+  speaker_scale: 1.5
+  native_pacing: true
+  post_generation_speedup: false
+audio_output:
+  format: wav
+  sample_rate: 48000
+  save_to_disk: false
+ui:
+  title: dots.tts Narration Server
+  show_language_select: true
+  max_predefined_voices_in_dropdown: 20
+debug:
+  save_intermediate_audio: false

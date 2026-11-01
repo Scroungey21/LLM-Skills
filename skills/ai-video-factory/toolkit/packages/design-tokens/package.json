@@ -1,0 +1,17 @@
+{
+  "name": "@ytpipeline/design-tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Design tokens — values fixed by tech-news-pipeline/design.md §4 (Phase 0) and phase-5-visual/design.md §2 (RD-53/54/55/56).",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "generate:tailwind": "tsx build-tailwind.ts",
+    "generate:json": "tsx dump-json.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "tsx": "^4.16.0"
+  }
+}

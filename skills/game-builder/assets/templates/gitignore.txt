@@ -2,3 +2,8 @@
 *.translation
 .mono/
 builds/
+.qa/
+_incoming/
+*credentials*.cfg
+!*credentials*.example.cfg
+*.env

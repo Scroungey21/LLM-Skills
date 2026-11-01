@@ -1,0 +1,13 @@
+{
+  "_comment": "Allowed blocks per district (fnmatch wildcards). 'global' applies everywhere. Air, jigsaw, structure blocks are always allowed. Add custom blocks as '<namespace>:name'. Starter values only: the art director decides the real list.",
+  "global": [
+    "minecraft:stone_bricks", "minecraft:cracked_stone_bricks", "minecraft:cobblestone", "minecraft:gravel",
+    "minecraft:dirt", "minecraft:coarse_dirt", "minecraft:oak_*", "minecraft:spruce_*", "minecraft:iron_bars",
+    "minecraft:glass_pane", "minecraft:chest", "minecraft:barrel", "minecraft:cobweb"
+  ],
+  "districts": {
+    "example_district": [
+      "minecraft:*_terracotta", "minecraft:smooth_sandstone*", "minecraft:sandstone*", "minecraft:white_concrete"
+    ]
+  }
+}

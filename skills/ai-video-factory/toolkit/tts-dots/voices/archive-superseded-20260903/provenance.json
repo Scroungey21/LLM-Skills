@@ -1,0 +1,19 @@
+{
+  "voice_id": "warm-informational",
+  "purpose": "Synthetic house voice reference for fast, warm educational narration",
+  "source": "Project-generated dots.tts SOAR audition selected after native-cadence QA",
+  "source_is_real_person": false,
+  "consent_status": "synthetic reference; no real-person identity or impersonation",
+  "sample_rate_hz": 48000,
+  "channels": 1,
+  "duration_seconds": 11.5,
+  "native_words_per_minute": 213.9,
+  "processing": [
+    "model-added boundary silence removed with 100 ms safety padding",
+    "four sentence-aware native generations joined with 40 ms safety gaps",
+    "PCM 24-bit"
+  ],
+  "tempo_or_pitch_processing": false,
+  "effects": [],
+  "transcript_file": "warm-informational.txt"
+}

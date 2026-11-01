@@ -1,0 +1,9 @@
+Packages/
+ServerPackages/
+sourcemap.json
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,1 @@
+That capacity is useful when the data needs to grow, but a cached DNS record doesn't grow. So CloudFlare replaced them with boxed slices and boxed strings, which completely removed that extra capacity field.

@@ -1,11 +1,14 @@
 # Toolchain - {{NAME}}
-Researched once, pinned here. Agents read this; they do not re-research.
+Researched once, pinned here. Agents read this; they do not re-research. Record the version actually installed, not the one from a guide.
 
 {{ENGINE_BLOCK}}
-Blender MCP:   claude mcp add blender uvx blender-mcp                     (MIT; set DISABLE_TELEMETRY=true)
-Skills:        npx skills add gamedev-skills/awesome-gamedev-agent-skills  (Apache-2.0; router + {{ENGINE}} bundle)
-Assets:        Kenney, Quaternius, KayKit (CC0), Poly Haven (CC0)
-Voice chat:    <<FILL vetted free option from the engine tools file, or "none / Discord fallback">>
-Networking:    {{NET}}  (see network/net.gd)
-Budget:        $0. Free-tier limits used: <<none>>
+Blender:       <<FILL path and version; run headless with --background --factory-startup --python; MCP server optional (name verified on the date below)>>
+Skills:        <<FILL companion skills chosen, e.g. an engine skill bundle>>
+Asset sources: <<FILL the sources chosen with the user, and the licence floor>>
+Voice chat:    <<FILL vetted option from the engine tools file, or "none">>
+Networking:    {{NET}}  (see network/net.gd; references/security.md)
+Reference machine: <<FILL CPU, GPU adapter name, memory, OS, resolution, target frame rate>>
+Budget:        <<FILL what may cost money; free-tier limits used>>
+QA tools:      gate runner tools/qa/gate.ps1; hooks under tools/qa/ (see references/quality-gates.md)
 Rejected:      <<FILL tool - reason>>
+Verified on:   <<FILL date>>

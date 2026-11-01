@@ -1,0 +1,246 @@
+{
+  "schema_version": "1.1.0",
+  "project_id": "stickman_demo",
+  "video_id": "pigeon_head_bob_demo",
+  "style_profile_id": "house_original_v0_local_default",
+  "script_hash": "sha256:0000000000000000demo-script-hash",
+  "evidence_packet_hash": "sha256:0000000000000000demo-evidence-hash",
+  "canvas": { "width": 1920, "height": 1080, "fps": 30, "pixel_format": "rgba" },
+  "timeline": { "duration_sec": 45.0, "narration_track_id": "narration_main", "music_track_id": "music_curious_bed_01" },
+  "global_audio": { "narration_lufs_target": -16, "true_peak_max_dbtp": -1.5, "music_duck_db": -16 },
+  "entities": [
+    {
+      "entity_id": "pigeon_01", "entity_type": "ANIMAL", "semantic_role": "subject",
+      "canonical_asset_id": "animal_pigeon_rig_v1", "persistence_scope": "VIDEO", "identity_lock": true,
+      "allowed_pose_ids": ["walk_hold", "walk_thrust"],
+      "default_state": {
+        "visible": false, "location_id": "loc_sidewalk_01", "position": { "x": 0.15, "y": 0.70 }, "scale": 1.0,
+        "rotation_deg": 0, "facing": "RIGHT", "pose_id": "walk_hold", "emotion_id": null, "z_index": 2, "attachments": []
+      }
+    },
+    {
+      "entity_id": "observer_01", "entity_type": "CHARACTER", "semantic_role": "viewer_proxy",
+      "canonical_asset_id": "char_stick_observer_v1", "persistence_scope": "VIDEO", "identity_lock": true,
+      "allowed_pose_ids": ["stand_neutral", "point_right", "look_down"],
+      "default_state": {
+        "visible": false, "location_id": "loc_sidewalk_01", "position": { "x": 0.78, "y": 0.68 }, "scale": 1.0,
+        "rotation_deg": 0, "facing": "LEFT", "pose_id": "stand_neutral", "emotion_id": null, "z_index": 2, "attachments": []
+      }
+    },
+    {
+      "entity_id": "guide_line_01", "entity_type": "DIAGRAM_OBJECT", "semantic_role": "world_space_marker",
+      "canonical_asset_id": "diagram_guide_line_v1", "persistence_scope": "SHOT", "identity_lock": false,
+      "allowed_pose_ids": [],
+      "default_state": {
+        "visible": false, "location_id": "loc_sidewalk_01", "position": { "x": 0.47, "y": 0.55 }, "scale": 1.0,
+        "rotation_deg": 0, "facing": "NA", "pose_id": null, "z_index": 3, "attachments": []
+      }
+    }
+  ],
+  "locations": [
+    {
+      "location_id": "loc_sidewalk_01", "location_type": "REAL_SCENARIO", "semantic_label": "city sidewalk, side view",
+      "background_asset_id": "bg_sidewalk_vector_01",
+      "layout_slots": [
+        { "slot_id": "left_actor", "position": { "x": 0.15, "y": 0.70 }, "facing_hint": "RIGHT" },
+        { "slot_id": "right_actor", "position": { "x": 0.78, "y": 0.68 }, "facing_hint": "LEFT" },
+        { "slot_id": "center_object", "position": { "x": 0.47, "y": 0.70 }, "facing_hint": null }
+      ]
+    },
+    {
+      "location_id": "loc_diagram_eye_01", "location_type": "DIAGRAM_SPACE", "semantic_label": "plain diagram stage",
+      "background_asset_id": null,
+      "layout_slots": [ { "slot_id": "diagram_center", "position": { "x": 0.5, "y": 0.5 }, "facing_hint": null } ]
+    }
+  ],
+  "assets": [
+    { "asset_id": "animal_pigeon_rig_v1", "asset_class": "ANIMAL", "representation": "PARAMETRIC_VECTOR", "strategy": "PROCEDURAL_GENERATE", "status": "PLANNED", "source_asset_id": null, "artifact_path": null, "content_hash": null, "provenance_id": null },
+    { "asset_id": "char_stick_observer_v1", "asset_class": "CHARACTER", "representation": "PARAMETRIC_VECTOR", "strategy": "PROCEDURAL_GENERATE", "status": "PLANNED" },
+    { "asset_id": "bg_sidewalk_vector_01", "asset_class": "BACKGROUND", "representation": "SVG", "strategy": "PROCEDURAL_GENERATE", "status": "PLANNED" },
+    { "asset_id": "diagram_guide_line_v1", "asset_class": "DIAGRAM", "representation": "SVG", "strategy": "PROCEDURAL_GENERATE", "status": "PLANNED" },
+    { "asset_id": "diagram_retina_stability_v1", "asset_class": "DIAGRAM", "representation": "PROCEDURAL", "strategy": "PROCEDURAL_GENERATE", "status": "PLANNED" },
+    { "asset_id": "icon_sense_set_v1", "asset_class": "ICON", "representation": "SVG", "strategy": "PROCEDURAL_GENERATE", "status": "PLANNED" },
+    { "asset_id": "music_curious_bed_01", "asset_class": "MUSIC", "representation": "AUDIO", "strategy": "SEARCH_REUSE", "status": "PLANNED" },
+    { "asset_id": "sfx_soft_accent_01", "asset_class": "SFX", "representation": "AUDIO", "strategy": "SEARCH_REUSE", "status": "PLANNED" }
+  ],
+  "shots": [
+    {
+      "shot_id": "sh_01", "scenario_id": "pigeon_sidewalk_01", "beat_ids": ["b_001"], "time": { "start_sec": 0.0, "end_sec": 5.0 },
+      "narration": "Watch a pigeon cross the sidewalk and its head seems to jerk forward with every step.",
+      "narrative_function": "HOOK", "scene_operation": "NEW_SCENARIO", "scene_type": "REAL_WORLD_SCENARIO", "location_id": "loc_sidewalk_01",
+      "continuity": {
+        "continuity_from_shot_id": null, "preconditions": [],
+        "state_patch": [
+          { "op": "REPLACE", "path": "/entities/pigeon_01/visible", "value": true },
+          { "op": "REPLACE", "path": "/entities/observer_01/visible", "value": true }
+        ],
+        "must_persist_entity_ids": ["pigeon_01", "observer_01"], "allow_discontinuity_reason": null
+      },
+      "camera": { "framing": "WIDE", "center": { "x": 0.5, "y": 0.55 }, "zoom": 1.0, "rotation_deg": 0, "safe_margins_pct": 5 },
+      "layers": [
+        { "layer_id": "l_bg", "source_type": "ASSET", "source_id": "bg_sidewalk_vector_01", "z_index": 0, "transform": { "position": { "x": 0.5, "y": 0.5 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_pigeon", "source_type": "ENTITY", "source_id": "pigeon_01", "z_index": 2, "transform": { "position": { "x": 0.15, "y": 0.70 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_observer", "source_type": "ENTITY", "source_id": "observer_01", "z_index": 2, "transform": { "position": { "x": 0.78, "y": 0.68 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 }
+      ],
+      "animation_events": [
+        { "event_id": "ev_01_walk", "target_id": "pigeon_01", "property": "POSITION", "time": { "start_sec": 0.0, "end_sec": 5.0 }, "interpolation": "LINEAR", "from": { "x": 0.15, "y": 0.70 }, "to": { "x": 0.45, "y": 0.70 } }
+      ],
+      "audio_events": [
+        { "event_id": "au_01_bed", "event_type": "MUSIC_CUE", "asset_id": "music_curious_bed_01", "start_sec": 0.0, "duration_sec": null, "gain_db": -22 }
+      ],
+      "asset_dependencies": ["animal_pigeon_rig_v1", "char_stick_observer_v1", "bg_sidewalk_vector_01", "music_curious_bed_01"],
+      "generation_policy": { "preferred_method": "VECTOR_PROCEDURAL", "fallback_methods": ["VECTOR_REUSE"], "workflow_id": null, "seed_policy": "NA", "max_attempts": 0, "cache_key_inputs": ["asset_id", "style_profile_id"] },
+      "retention_function": "CURIOSITY", "source_claim_ids": [],
+      "qa_assertions": [ { "assertion_id": "qa_01_visible", "path": "/entities/pigeon_01/visible", "operator": "EQ", "value": true, "severity": "ERROR" } ]
+    },
+    {
+      "shot_id": "sh_02", "scenario_id": "pigeon_sidewalk_01", "beat_ids": ["b_002"], "time": { "start_sec": 5.0, "end_sec": 9.0 },
+      "narration": "It looks like the bird is bobbing its head for balance. But that is not the useful part to watch.",
+      "narrative_function": "QUESTION", "scene_operation": "MUTATE_SCENARIO", "scene_type": "CHARACTER_INTERACTION", "location_id": "loc_sidewalk_01",
+      "continuity": {
+        "continuity_from_shot_id": "sh_01",
+        "preconditions": [ { "assertion_id": "pc_02_obs", "path": "/entities/observer_01/pose_id", "operator": "EQ", "value": "stand_neutral", "severity": "ERROR" } ],
+        "state_patch": [ { "op": "REPLACE", "path": "/entities/observer_01/pose_id", "value": "point_right" } ],
+        "must_persist_entity_ids": ["pigeon_01", "observer_01"], "allow_discontinuity_reason": null
+      },
+      "camera": { "framing": "WIDE", "center": { "x": 0.5, "y": 0.55 }, "zoom": 1.0, "rotation_deg": 0, "safe_margins_pct": 5 },
+      "layers": [
+        { "layer_id": "l_bg", "source_type": "ASSET", "source_id": "bg_sidewalk_vector_01", "z_index": 0, "transform": { "position": { "x": 0.5, "y": 0.5 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_pigeon", "source_type": "ENTITY", "source_id": "pigeon_01", "z_index": 2, "transform": { "position": { "x": 0.45, "y": 0.70 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_observer", "source_type": "ENTITY", "source_id": "observer_01", "z_index": 2, "transform": { "position": { "x": 0.78, "y": 0.68 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 }
+      ],
+      "animation_events": [
+        { "event_id": "ev_02_point", "target_id": "observer_01", "property": "POSE", "time": { "start_sec": 6.2, "end_sec": 6.5 }, "interpolation": "EASE_IN_OUT", "from": "stand_neutral", "to": "point_right" }
+      ],
+      "audio_events": [ { "event_id": "au_02_accent", "event_type": "SFX", "asset_id": "sfx_soft_accent_01", "start_sec": 6.2, "duration_sec": 0.4, "gain_db": -24, "sync_target_event_id": "ev_02_point" } ],
+      "asset_dependencies": ["char_stick_observer_v1", "animal_pigeon_rig_v1", "sfx_soft_accent_01"],
+      "generation_policy": { "preferred_method": "VECTOR_REUSE", "fallback_methods": ["VECTOR_PROCEDURAL"], "workflow_id": null, "seed_policy": "NA", "max_attempts": 0, "cache_key_inputs": ["asset_id"] },
+      "retention_function": "SURPRISE", "source_claim_ids": [],
+      "qa_assertions": []
+    },
+    {
+      "shot_id": "sh_03", "scenario_id": "pigeon_sidewalk_01", "beat_ids": ["b_003"], "time": { "start_sec": 9.0, "end_sec": 16.0 },
+      "narration": "For part of each step, the head is actually staying almost still in space while the body moves underneath it.",
+      "narrative_function": "MECHANISM", "scene_operation": "CAMERA_CUT", "scene_type": "OBJECT_DEMONSTRATION", "location_id": "loc_sidewalk_01",
+      "continuity": {
+        "continuity_from_shot_id": "sh_02", "preconditions": [], "state_patch": [ { "op": "REPLACE", "path": "/entities/guide_line_01/visible", "value": true } ],
+        "must_persist_entity_ids": ["pigeon_01", "observer_01"], "allow_discontinuity_reason": null
+      },
+      "camera": { "framing": "MEDIUM_CLOSE", "center": { "x": 0.47, "y": 0.62 }, "zoom": 2.2, "rotation_deg": 0, "safe_margins_pct": 8 },
+      "layers": [
+        { "layer_id": "l_bg", "source_type": "ASSET", "source_id": "bg_sidewalk_vector_01", "z_index": 0, "transform": { "position": { "x": 0.5, "y": 0.5 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_pigeon", "source_type": "ENTITY", "source_id": "pigeon_01", "z_index": 2, "transform": { "position": { "x": 0.45, "y": 0.70 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_guide", "source_type": "ENTITY", "source_id": "guide_line_01", "z_index": 3, "transform": { "position": { "x": 0.47, "y": 0.55 }, "scale": 1, "rotation_deg": 0 }, "opacity": 0.8 }
+      ],
+      "animation_events": [
+        { "event_id": "ev_03_body", "target_id": "pigeon_01", "target_component": "body", "property": "POSITION", "time": { "start_sec": 9.5, "end_sec": 14.0 }, "interpolation": "LINEAR", "from": { "x": 0.45, "y": 0.70 }, "to": { "x": 0.52, "y": 0.70 } }
+      ],
+      "constraints": [
+        { "constraint_id": "cn_03_head_hold", "target_id": "pigeon_01", "target_component": "head", "kind": "LOCK_X", "time": { "start_sec": 9.5, "end_sec": 14.0 }, "space": "WORLD", "reference_id": null, "reference_component": null, "value": 0.47, "tolerance": 0.01 }
+      ],
+      "audio_events": [],
+      "text_elements": [ { "text_id": "tx_03_label", "content": "head: nearly still", "role": "LABEL", "start_sec": 11.0, "end_sec": 14.5, "style_token": null } ],
+      "asset_dependencies": ["animal_pigeon_rig_v1", "bg_sidewalk_vector_01", "diagram_guide_line_v1"],
+      "generation_policy": { "preferred_method": "VECTOR_REUSE", "fallback_methods": [], "workflow_id": null, "seed_policy": "NA", "max_attempts": 0, "cache_key_inputs": ["asset_id"] },
+      "retention_function": "CLARIFY", "source_claim_ids": ["pigeon_c1", "pigeon_c2"], "confidence": 0.95,
+      "qa_assertions": [ { "assertion_id": "qa_03_claims", "path": "/shots/sh_03/source_claim_ids", "operator": "EXISTS", "severity": "ERROR" } ]
+    },
+    {
+      "shot_id": "sh_04", "scenario_id": "pigeon_sidewalk_01", "beat_ids": ["b_004"], "time": { "start_sec": 16.0, "end_sec": 22.0 },
+      "narration": "Then the pigeon rapidly thrusts the head to a new position and holds it again.",
+      "narrative_function": "MECHANISM", "scene_operation": "MUTATE_SCENARIO", "scene_type": "OBJECT_DEMONSTRATION", "location_id": "loc_sidewalk_01",
+      "continuity": {
+        "continuity_from_shot_id": "sh_03",
+        "preconditions": [ { "assertion_id": "pc_04_guide", "path": "/entities/guide_line_01/visible", "operator": "EQ", "value": true, "severity": "ERROR" } ],
+        "state_patch": [ { "op": "REPLACE", "path": "/entities/pigeon_01/pose_id", "value": "walk_thrust" } ],
+        "must_persist_entity_ids": ["pigeon_01", "observer_01"], "allow_discontinuity_reason": null
+      },
+      "camera": { "framing": "MEDIUM_CLOSE", "center": { "x": 0.5, "y": 0.62 }, "zoom": 2.2, "rotation_deg": 0, "safe_margins_pct": 8 },
+      "layers": [
+        { "layer_id": "l_bg", "source_type": "ASSET", "source_id": "bg_sidewalk_vector_01", "z_index": 0, "transform": { "position": { "x": 0.5, "y": 0.5 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_pigeon", "source_type": "ENTITY", "source_id": "pigeon_01", "z_index": 2, "transform": { "position": { "x": 0.52, "y": 0.70 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 }
+      ],
+      "animation_events": [
+        { "event_id": "ev_04_head_thrust", "target_id": "pigeon_01", "target_component": "head", "property": "POSITION", "time": { "start_sec": 16.5, "end_sec": 16.8 }, "interpolation": "EASE_OUT", "from": { "x": 0.47, "y": 0.55 }, "to": { "x": 0.55, "y": 0.55 } }
+      ],
+      "audio_events": [ { "event_id": "au_04_accent", "event_type": "SFX", "asset_id": "sfx_soft_accent_01", "start_sec": 16.5, "duration_sec": 0.3, "gain_db": -24, "sync_target_event_id": "ev_04_head_thrust" } ],
+      "asset_dependencies": ["animal_pigeon_rig_v1", "sfx_soft_accent_01"],
+      "generation_policy": { "preferred_method": "VECTOR_REUSE", "fallback_methods": [], "workflow_id": null, "seed_policy": "NA", "max_attempts": 0, "cache_key_inputs": ["asset_id"] },
+      "retention_function": "CLARIFY", "source_claim_ids": ["pigeon_c1"],
+      "qa_assertions": []
+    },
+    {
+      "shot_id": "sh_05", "scenario_id": "pigeon_insert_01", "beat_ids": ["b_005"], "time": { "start_sec": 22.0, "end_sec": 31.0 },
+      "narration": "That hold-and-thrust pattern helps stabilize what the bird sees, instead of letting the whole visual world smear continuously as it walks.",
+      "narrative_function": "MECHANISM", "scene_operation": "INSERT_EXPLAINER", "scene_type": "EXPLANATORY_DIAGRAM", "location_id": "loc_diagram_eye_01",
+      "continuity": {
+        "continuity_from_shot_id": "sh_04", "preconditions": [],
+        "state_patch": [],
+        "must_persist_entity_ids": ["pigeon_01", "observer_01"],
+        "allow_discontinuity_reason": "Non-diegetic insert: sidewalk scenario is pushed on the return stack and restored by sh_07."
+      },
+      "camera": { "framing": "DIAGRAM", "center": { "x": 0.5, "y": 0.5 }, "zoom": 1.0, "rotation_deg": 0, "safe_margins_pct": 6 },
+      "layers": [
+        { "layer_id": "l_diag", "source_type": "ASSET", "source_id": "diagram_retina_stability_v1", "z_index": 1, "transform": { "position": { "x": 0.5, "y": 0.5 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 }
+      ],
+      "animation_events": [
+        { "event_id": "ev_05_reveal", "target_id": "l_diag", "property": "MASK_REVEAL", "time": { "start_sec": 22.5, "end_sec": 27.5 }, "interpolation": "LINEAR", "from": 0, "to": 1 }
+      ],
+      "audio_events": [ { "event_id": "au_05_duck", "event_type": "MUSIC_DUCK", "asset_id": null, "start_sec": 22.0, "duration_sec": 9.0, "gain_db": -16 } ],
+      "text_elements": [ { "text_id": "tx_05_a", "content": "stable image", "role": "LABEL", "start_sec": 24.0, "end_sec": 29.0, "style_token": null } ],
+      "asset_dependencies": ["diagram_retina_stability_v1"],
+      "generation_policy": { "preferred_method": "VECTOR_PROCEDURAL", "fallback_methods": [], "workflow_id": null, "seed_policy": "NA", "max_attempts": 0, "cache_key_inputs": ["asset_id", "claim_ids"] },
+      "retention_function": "CLARIFY", "source_claim_ids": ["pigeon_c3"], "confidence": 0.8,
+      "qa_assertions": []
+    },
+    {
+      "shot_id": "sh_06", "scenario_id": "pigeon_insert_01", "beat_ids": ["b_006"], "time": { "start_sec": 31.0, "end_sec": 38.0 },
+      "narration": "The full control system is not just one simple eye reflex; later work shows vision interacts with other sensory feedback used to stabilize the head.",
+      "narrative_function": "COUNTERPOINT", "scene_operation": "OVERLAY_ONLY", "scene_type": "EXPLANATORY_DIAGRAM", "location_id": "loc_diagram_eye_01",
+      "continuity": { "continuity_from_shot_id": "sh_05", "preconditions": [], "state_patch": [], "must_persist_entity_ids": [], "allow_discontinuity_reason": null },
+      "camera": { "framing": "DIAGRAM", "center": { "x": 0.5, "y": 0.5 }, "zoom": 1.0, "rotation_deg": 0, "safe_margins_pct": 6 },
+      "layers": [
+        { "layer_id": "l_diag", "source_type": "ASSET", "source_id": "diagram_retina_stability_v1", "z_index": 1, "transform": { "position": { "x": 0.5, "y": 0.5 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_icons", "source_type": "ASSET", "source_id": "icon_sense_set_v1", "z_index": 2, "transform": { "position": { "x": 0.5, "y": 0.75 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 }
+      ],
+      "animation_events": [
+        { "event_id": "ev_06_icons", "target_id": "l_icons", "property": "OPACITY", "time": { "start_sec": 32.0, "end_sec": 36.0 }, "interpolation": "EASE_IN", "from": 0, "to": 1 }
+      ],
+      "audio_events": [],
+      "text_elements": [ { "text_id": "tx_06_a", "content": "vision + other feedback", "role": "LABEL", "start_sec": 33.0, "end_sec": 37.5, "style_token": null } ],
+      "asset_dependencies": ["diagram_retina_stability_v1", "icon_sense_set_v1"],
+      "generation_policy": { "preferred_method": "VECTOR_PROCEDURAL", "fallback_methods": [], "workflow_id": null, "seed_policy": "NA", "max_attempts": 0, "cache_key_inputs": ["asset_id", "claim_ids"] },
+      "retention_function": "SURPRISE", "source_claim_ids": ["pigeon_c3"], "confidence": 0.8,
+      "qa_assertions": []
+    },
+    {
+      "shot_id": "sh_07", "scenario_id": "pigeon_sidewalk_01", "beat_ids": ["b_007"], "time": { "start_sec": 38.0, "end_sec": 45.0 },
+      "narration": "So next time the head seems to bob, watch the body instead: for a moment, the strange part is that the head barely moves at all.",
+      "narrative_function": "CALLBACK", "scene_operation": "CALLBACK", "scene_type": "CALLBACK", "location_id": "loc_sidewalk_01",
+      "continuity": {
+        "continuity_from_shot_id": "sh_04",
+        "preconditions": [
+          { "assertion_id": "pc_07_pigeon", "path": "/entities/pigeon_01/visible", "operator": "EQ", "value": true, "severity": "ERROR" },
+          { "assertion_id": "pc_07_loc", "path": "/entities/observer_01/location_id", "operator": "EQ", "value": "loc_sidewalk_01", "severity": "ERROR" }
+        ],
+        "state_patch": [ { "op": "REPLACE", "path": "/entities/observer_01/pose_id", "value": "look_down" } ],
+        "must_persist_entity_ids": ["pigeon_01", "observer_01"], "allow_discontinuity_reason": null
+      },
+      "camera": { "framing": "WIDE", "center": { "x": 0.5, "y": 0.55 }, "zoom": 1.0, "rotation_deg": 0, "safe_margins_pct": 5 },
+      "layers": [
+        { "layer_id": "l_bg", "source_type": "ASSET", "source_id": "bg_sidewalk_vector_01", "z_index": 0, "transform": { "position": { "x": 0.5, "y": 0.5 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_pigeon", "source_type": "ENTITY", "source_id": "pigeon_01", "z_index": 2, "transform": { "position": { "x": 0.52, "y": 0.70 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 },
+        { "layer_id": "l_observer", "source_type": "ENTITY", "source_id": "observer_01", "z_index": 2, "transform": { "position": { "x": 0.78, "y": 0.68 }, "scale": 1, "rotation_deg": 0 }, "opacity": 1 }
+      ],
+      "animation_events": [
+        { "event_id": "ev_07_look", "target_id": "observer_01", "property": "POSE", "time": { "start_sec": 38.5, "end_sec": 38.9 }, "interpolation": "EASE_IN_OUT", "from": "point_right", "to": "look_down" }
+      ],
+      "audio_events": [ { "event_id": "au_07_silence", "event_type": "SILENCE_BEAT", "asset_id": null, "start_sec": 43.5, "duration_sec": 0.5, "gain_db": -60 } ],
+      "asset_dependencies": ["bg_sidewalk_vector_01", "animal_pigeon_rig_v1", "char_stick_observer_v1"],
+      "generation_policy": { "preferred_method": "VECTOR_REUSE", "fallback_methods": [], "workflow_id": null, "seed_policy": "NA", "max_attempts": 0, "cache_key_inputs": ["asset_id"] },
+      "retention_function": "PAYOFF", "source_claim_ids": ["pigeon_c1", "pigeon_c2"],
+      "qa_assertions": []
+    }
+  ],
+  "quality_contract": { "max_unresolved_continuity_errors": 0, "max_missing_asset_dependencies": 0, "required_gate_status": "PASS" }
+}

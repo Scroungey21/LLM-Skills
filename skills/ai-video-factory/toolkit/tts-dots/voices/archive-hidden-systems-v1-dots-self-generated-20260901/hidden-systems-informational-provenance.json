@@ -1,0 +1,64 @@
+{
+  "voice_id": "hidden-systems-informational",
+  "purpose": "Synthetic house voice reference for the Hidden Everyday Systems channel, deliberately distinct from technews's warm-informational voice",
+  "source": "Reference-conditioned dots.tts SOAR generation (prompt_audio_path + prompt_text biased toward an external timbre sample), seed 50001005, reviewed for native pacing, F0 male-register fit, objective cutoff cleanliness, and ASR round-trip intelligibility, then locked in as a fixed self-reference",
+  "source_is_real_person": false,
+  "consent_status": "synthetic reference; the model does not replay or clone the reference sample verbatim, it generates a new synthetic utterance conditioned on its timbre -- no real-person identity or impersonation in the delivered voice",
+  "external_reference_used_for_conditioning": {
+    "dataset": "LibriTTS-R (mythicinfinity/libritts_r on HuggingFace)",
+    "license": "CC BY 4.0 -- commercial and derivative/synthetic reuse explicitly permitted; underlying narration itself derives from public-domain LibriVox audiobook recordings",
+    "speaker_id": "2902",
+    "utterance_id": "2902_9008_000046_000000",
+    "split": "dev.clean",
+    "clip_duration_s": 19.84,
+    "selection_method": "Screened 26 distinct LibriTTS-R speakers by objectively measuring median F0 (autocorrelation) to find a deep/warm male register (~85-165 Hz), then visually inspected a log-scale spectrogram of the winning clip for noise floor, hiss/hum, and clipping before use. Not a source of literal audio, only a conditioning prior for dots.tts's own synthesis.",
+    "note": "This external clip is NOT part of the delivered channel voice; it was discarded after conditioning. The delivered wav/txt in this directory is dots.tts's own synthetic output."
+  },
+  "sample_rate_hz": 48000,
+  "channels": 1,
+  "duration_seconds": 10.39,
+  "native_words_per_minute": 179.0,
+  "generation": {
+    "model": "dots-studio/dots.tts-soar",
+    "seed": 50001005,
+    "num_steps": 16,
+    "guidance_scale": 1.2,
+    "speaker_scale": 1.5,
+    "ode_method": "euler",
+    "prompt_audio_path": "external LibriTTS-R speaker 2902 clip (see external_reference_used_for_conditioning); discarded after this bootstrap generation",
+    "prompt_text": "the LibriTTS-R clip's own transcript (Hypatia passage, ending \"...to torment me.\"); NOT the transcript stored in hidden-systems-informational.txt, which is this file's own delivered narration",
+    "template_name": "tts"
+  },
+  "review": {
+    "native_pacing_gate": "165-240 WPM (project convention); measured 179.0 WPM after the crop described below",
+    "register_check": "autocorrelation-based F0 estimate: median 145.0 Hz, std 52.7 Hz over 328 voiced frames -- solidly in the reviewed male band (85-180 Hz), close to the register the user responded well to in an earlier rejected candidate (165.2 Hz)",
+    "cleanliness_check": "reverb/room-tail proxy: mean cutoff decay 7.3 dB across 3 uncontaminated silence offsets (RMS 0-50ms vs 150-250ms after voice-to-silence transitions). Comparable to the previously-rejected candidate's 8.4 dB; the user's real complaint about that candidate was not this metric but overall audio character, which cannot be measured objectively and was confirmed only by the user listening.",
+    "audio_qa": "ffmpeg volumedetect mean -21.3 dB / max -0.4 dB on the pre-crop take, silencedetect at -45dB/0.15s found only natural inter-phrase pauses, peak sample amplitude 0.958 (no clipping)",
+    "asr_round_trip": "faster-whisper small.en (CPU, int8) transcribed the file back to its exact reference transcript, word for word, after the defect fix below -- passed. This is the specific check the 2026-09-01 warm-informational corruption incident (see archive-broken-reference-20260901/) skipped and later required.",
+    "defect_found_and_fixed": "The initial reference-conditioned batch (all 4 candidates, all seeds) produced a spurious low-confidence leading word (' me.', ASR probability 0.67) before a real silence gap and the actual requested narration -- traced to the external reference clip's own final word ('...to torment me.') bleeding into the start of generation. Cropped the first 0.95s (with a 30ms fade-in to avoid a click) and re-ran the ASR round-trip, which then matched the target text exactly. Re-measured all gates (pacing/F0/decay) on the cropped audio -- all still pass.",
+    "leak_regression_check": "Ran 3 additional generations against the CROPPED clip (this file) as reference, targeting three sentences unrelated to its own transcript, specifically to check whether the reference's own final word ('...how they work.') would leak the same way into future production chunks. None of the 3 test outputs showed any leaked fragment; ASR transcripts matched their target sentences exactly. The original defect appears specific to the external LibriTTS clip, not a systemic dots.tts behavior -- but this is a residual risk worth an occasional spot-check on future production audio.",
+    "human_listening_review": "user auditioned this candidate (referenced-seed50001005-alt.wav) among 4 reference-conditioned options and explicitly selected it; the leaked-word defect and its fix were found and applied AFTER that selection, during locked-in provenance verification, and were not part of what the user heard -- the cropped file has not yet been re-listened to by the user post-fix"
+  },
+  "processing": [
+    "model-added boundary silence removed with 100 ms safety padding",
+    "leaked reference-artifact leading word ('me.') removed by cropping the first 0.95s, with a 30ms fade-in to avoid an audible click",
+    "PCM 16-bit"
+  ],
+  "tempo_or_pitch_processing": false,
+  "effects": [],
+  "transcript_file": "hidden-systems-informational.txt",
+  "rejected_candidates": {
+    "reroll_seed40002001": "F0 106.2 Hz (male band), decay_db 7.9 -- not measurably cleaner than the take the user had already rejected",
+    "reroll_seed40002002": "F0 207.3 Hz -- outside the reviewed male band, close to a register the user explicitly rejected as not male-sounding",
+    "reroll_seed40002003": "F0 279.1 Hz -- well outside the male band",
+    "reroll_seed40002004": "F0 192.0 Hz -- outside the male band",
+    "reroll_seed40002006": "F0 237.0 Hz, cadence 162.2 WPM -- outside the male band and below the pacing gate",
+    "reroll_seed40002007": "F0 229.7 Hz -- outside the male band",
+    "reroll_seed40002008": "F0 205.1 Hz, cadence 161.5 WPM -- outside the male band and below the pacing gate",
+    "referenced_seed50001001": "cadence 149.3 WPM -- below the 165-240 WPM pacing gate despite good register/decay",
+    "referenced_seed50001002": "F0 159.7 Hz, decay_db 9.4 -- passed all gates and was a top contender; not selected by the user",
+    "referenced_seed50001003": "F0 151.4 Hz, decay_db 6.7 -- passed all gates; not selected by the user",
+    "referenced_seed50001004": "F0 133.0 Hz, decay_db 7.8 -- passed all gates (deepest register in the batch); not selected by the user",
+    "referenced_seed50001006": "F0 152.4 Hz, decay_db 8.6 -- passed all gates; not selected by the user"
+  }
+}

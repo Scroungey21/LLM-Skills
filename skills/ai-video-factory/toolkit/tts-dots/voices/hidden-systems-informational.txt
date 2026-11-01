@@ -1,0 +1,1 @@
+Here is what actually happened and why it matters. A security researcher found the flaw in under an hour and the vendor confirmed it the same day.

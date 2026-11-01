@@ -1,0 +1,23 @@
+# Gradle / IDE
+.gradle/
+build/
+out/
+.idea/
+*.iml
+.vscode/
+# Local game runs (never commit worlds or logs)
+run/
+runs/
+saves/
+logs/
+crash-reports/
+*.log
+# Exports
+*.mrpack
+dist/
+# OS
+.DS_Store
+Thumbs.db
+# Optional: use Git LFS for large binaries (audio, images). Uncomment after `git lfs install`
+# *.ogg filter=lfs diff=lfs merge=lfs -text
+# *.png filter=lfs diff=lfs merge=lfs -text

@@ -1,29 +1,36 @@
 #!/usr/bin/env python3
 """Create a project skeleton that follows the game-builder standard.
 
-usage: scaffold.py --name "Haunted Mall" --type party-coop --net online --path ./haunted-mall
+usage: scaffold.py --name "Star Courier" --type platformer --net online --path ./star-courier
                    [--engine godot|unity|unreal] [--engine-version 4.7] [--no-agents]
 
-types:  party-coop platformer shooter racing puzzle strategy survival narrative arcade
+types:  party-coop platformer shooter racing puzzle strategy survival narrative arcade   (party-coop = multiplayer party/co-op)
 net:    none (single player) | local (same screen) | lan | online
 engine: godot (default): creates a full booting project.
         unity / unreal: run INSIDE an existing project (create it first in Unity Hub / the Unreal launcher);
         adds _project docs, category folders, agents. No engine code stubs are generated for them.
+It does NOT choose a look: _project/ART_DIRECTION.md is a blank template for the user's answers.
+Godot projects also get tools/qa/ (gate.ps1, net_test.ps1, check_project.py) so the project runs its own gates.
 """
 import argparse, pathlib, re, shutil, sys
 
 SKILL = pathlib.Path(__file__).resolve().parent.parent
 HERE = SKILL / "assets" / "templates"
 AGENTS = SKILL / "assets" / "agents"
+SCRIPTS = SKILL / "scripts"
 
 DESC = {
-    "_project": "Design docs: vision, style bible, decisions, credits, toolchain, evidence screenshots.",
-    "shared": "Palette, the one shared shader/material, and the shared seams (state, events).",
-    "audio/music": "Music tracks.", "audio/sfx": "Sound effects.",
+    "_project": "Design docs: vision, art direction, decisions, credits, toolchain, handoff, release checklist, sound events, evidence images.",
+    "shared": "The shared seams (state, events) and anything truly used everywhere.",
+    "audio/music": "Music tracks (one file per slot, see _project/SOUND_EVENTS.md).", "audio/sfx": "Recorded sound effects, grouped by family.",
+    "tools/qa": "QA tools: gate runner, detectors, preview and tour scripts, balance and perf drivers. Excluded from export.",
+    "tools/audio": "Audio processing scripts (sources in, game files out; deterministic). Excluded from export.",
+    "tools/blender": "Model generator and verifier scripts (run headless). Excluded from export.",
     "ui/main_menu": "Title screen.", "ui/hud": "In-game overlay (score, timer, prompts).",
-    "ui/game_over": "Defeat screen.", "ui/victory": "Win screen.", "ui/settings": "Volume, controls, quality.",
+    "ui/game_over": "Defeat screen.", "ui/victory": "Win screen.", "ui/settings": "Volume, controls, graphics presets.",
+    "ui/credits": "Credits screen, generated from CREDITS.md.",
     "ui/room": "Lobby: player list, room code, Start button.",
-    "network": "All multiplayer code (host, join, room codes, kick).",
+    "network": "All multiplayer code (host, join, the door, room codes, kick).",
     "addons": "Pinned third-party code (e.g. GUT). Never edit by hand.",
     "tests": "Automated tests and the multiplayer smoke test.",
     "levels/level1": "The first level: scene, script, and the objects that live only here.",
@@ -34,7 +41,7 @@ DESC = {
     "characters/enemies": "Enemy scenes, scripts and models.", "characters/npcs": "Non-player characters.",
     "objects": "Props shared by several levels (each: scene + script + models).",
     "objects/pickups": "Collectibles.", "objects/hazards": "Things that hurt.",
-    "weapons": "Weapons and projectiles.", "vehicles": "Vehicles and vehicles script.",
+    "weapons": "Weapons and projectiles.", "vehicles": "Vehicles and the vehicles script.",
     "units": "Unit types (data + scene).", "buildings": "Building types (data + scene).",
     "puzzles": "One data file per puzzle/level; rules live in board/.", "board": "Pure puzzle rules, no visuals.",
     "items": "Item definitions.", "crafting": "Recipes.", "world": "World generation and chunks.",
@@ -42,7 +49,8 @@ DESC = {
     "story": "Dialogue and branching script data.", "scenes": "Story scenes (backgrounds + characters).",
     "saves": "Save-file code (not the save data itself).",
 }
-BASE = ["shared", "audio/music", "audio/sfx", "ui/main_menu", "ui/hud", "ui/game_over", "ui/victory", "ui/settings", "tests"]
+BASE = ["shared", "audio/music", "audio/sfx", "ui/main_menu", "ui/hud", "ui/game_over", "ui/victory", "ui/settings", "ui/credits",
+        "tests", "tools/qa", "tools/audio", "tools/blender"]
 TYPES = {
     "party-coop": ["levels/level1", "characters/players", "characters/enemies", "objects"],
     "platformer": ["levels/world1/level1", "characters/player", "characters/enemies", "objects/pickups", "objects/hazards"],
@@ -54,19 +62,25 @@ TYPES = {
     "narrative":  ["story", "scenes", "characters/npcs"],
     "arcade":     ["levels/level1", "characters/player", "characters/enemies", "objects"],
 }
+DOCS = ["GAME_VISION.md", "ART_DIRECTION.md", "DECISIONS.md", "CREDITS.md", "TOOLCHAIN.md", "HANDOFF.md", "RELEASE_CHECKLIST.md", "SOUND_EVENTS.md"]
 ENGINE_NAMES = {"godot": "Godot", "unity": "Unity", "unreal": "Unreal Engine"}
 ENGINE_BLOCKS = {
-    "godot": ('Engine:        Godot {V} stable (pinned; do not upgrade mid-project)\nLanguage:      GDScript\n'
-              'Editor MCP:    claude mcp add godot -e GODOT_PATH=/path/to/godot -- npx @coding-solo/godot-mcp   (MIT)\n'
-              'Tests:         GUT 9.x (addons/gut), headless; scripts/gate_boot.sh and scripts/net_test.sh'),
-    "unity": ('Engine:        Unity {V} LTS (pinned)\nLanguage:      C#, URP\n'
-              'Editor MCP:    Package Manager git URL https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#<pinned tag>   (or IvanMurzak/Unity-MCP)\n'
-              'Networking:    <<FILL NGO | Mirror; free-tier limits of Relay/Vivox if used>>\n'
+    "godot": ('Engine:        Godot {V} (record the exact version installed; do not upgrade mid-project)\nLanguage:      GDScript\n'
+              'Editor MCP:    <<FILL one editor-control server, or none; see references/tools-godot.md>>\n'
+              'Tests:         GUT 9.x (addons/gut), headless; gates via tools/qa/gate.ps1 (scripts/gate_boot.sh, net_test.sh are bash variants)'),
+    "unity": ('Engine:        Unity {V} LTS (record the exact version installed)\nLanguage:      C#\n'
+              'Editor MCP:    <<FILL one server, or none; see references/tools-unity.md>>\n'
+              'Networking:    <<FILL NGO | Mirror; free-tier limits of any relay or voice service used>>\n'
               'Tests:         Unity Test Framework (EditMode/PlayMode)'),
-    "unreal": ('Engine:        Unreal Engine {V} (pinned)\nLanguage:      C++ base classes + Blueprint subclasses (confirm with user)\n'
-               'Editor MCP:    ChiR24/Unreal_mcp (MIT) | Epic official Unreal MCP (5.8, experimental) | ATDev uemcp   <<FILL the one chosen>>\n'
-               'Networking:    built-in replication, listen server; <<FILL EOS terms if used>>\n'
+    "unreal": ('Engine:        Unreal Engine {V} (record the exact version installed)\nLanguage:      C++ base classes + Blueprint subclasses (confirm with user)\n'
+               'Editor MCP:    <<FILL one server, or none; see references/tools-unreal.md>>\n'
+               'Networking:    built-in replication, listen server; <<FILL platform service terms if used>>\n'
                'Tests:         Automation / Functional Tests'),
+}
+README_STUBS = {
+    "tools/qa": "# tools/qa\nQA tools for this project. Never autoloaded, excluded from the export preset (tools/*).\nHooks the gate runner looks for: walker.gd, level_check.gd, clip_check.gd, anim_check.gd, sfx_check.gd, balance_report.gd, security_check.gd.\nSee references/quality-gates.md in the game-builder skill.\n",
+    "tools/audio": "# tools/audio\nDeterministic audio processing scripts: sources (in the git-ignored _incoming/) in, game files out. Recorded sounds only unless the user asked otherwise.\nSee references/audio.md in the game-builder skill.\n",
+    "tools/blender": "# tools/blender\nModel generator and verifier scripts. Run headless: blender --background --factory-startup --python script.py -- <args>.\nSee references/assets.md in the game-builder skill.\n",
 }
 
 def pascal(path):
@@ -78,7 +92,7 @@ def fill(text, ctx):
     return text
 
 def main():
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--name", required=True)
     ap.add_argument("--type", required=True, choices=sorted(TYPES))
     ap.add_argument("--net", default="none", choices=["none", "local", "lan", "online"])
@@ -103,18 +117,19 @@ def main():
         if (root / "_project").exists():
             sys.exit("_project/ already exists here: refusing to overwrite")
 
-    # (godot-style key, engine path) pairs
     keys = BASE + TYPES[a.type] + (["network", "ui/room"] if networked else [])
     if a.engine == "godot":
         keys += ["addons"]
         pairs = [(k, k) for k in keys]
     elif a.engine == "unity":
-        pairs = [(k, "Assets/Game/" + pascal(k)) for k in keys if k != "tests"] + [("tests", "Assets/Tests")]
+        pairs = [(k, "Assets/Game/" + pascal(k)) for k in keys if k not in ("tests", "tools/qa", "tools/audio", "tools/blender")] + [("tests", "Assets/Tests")]
+        pairs += [(k, k) for k in ("tools/qa", "tools/audio", "tools/blender")]
     else:
-        content = [k for k in keys if k not in ("tests", "network")]
+        content = [k for k in keys if k not in ("tests", "network") and not k.startswith("tools/")]
         pairs = [(k, "Content/" + pascal(k)) for k in content]
         pairs += [(k, f"Source/{game}/" + pascal(k)) for k in keys if k in ("network", "shared", "tests")
                   or k.split("/")[0] in ("levels", "characters", "objects", "ui", "vehicles", "weapons", "tracks", "maps", "units", "buildings", "board")]
+        pairs += [(k, k) for k in ("tools/qa", "tools/audio", "tools/blender")]
     pairs.append(("_project", "_project"))
 
     for _, ep in pairs:
@@ -123,14 +138,21 @@ def main():
         if a.engine != "godot":
             (d / ".gitkeep").touch()
     (root / "_project" / "evidence").mkdir(parents=True, exist_ok=True)
+    for k, txt in README_STUBS.items():
+        (root / k / "README.md").write_text(txt)
 
     ctx = {"NAME": a.name, "TYPE": a.type, "NET": a.net, "GODOT": ev, "ENGINE": ENGINE_NAMES[a.engine],
            "ENGINE_NAME": f"{ENGINE_NAMES[a.engine]} {ev}" + (", GDScript" if a.engine == "godot" else ""),
            "ENGINE_BLOCK": ENGINE_BLOCKS[a.engine].replace("{V}", ev)}
-    for doc in ["GAME_VISION.md", "STYLE_BIBLE.md", "DECISIONS.md", "CREDITS.md", "TOOLCHAIN.md"]:
+    for doc in DOCS:
         (root / "_project" / doc).write_text(fill((HERE / doc).read_text(), ctx))
     if a.engine == "godot" or not (root / ".gitignore").exists():
         shutil.copy(HERE / "gitignore.txt", root / ".gitignore")
+    else:   # engine projects bring their own .gitignore: append the safety entries we need
+        have = (root / ".gitignore").read_text()
+        extra = [l for l in (HERE / "gitignore.txt").read_text().splitlines() if l.strip() and l not in have and not l.startswith(".godot") and not l.startswith(".mono") and not l.endswith(".translation")]
+        if extra:
+            (root / ".gitignore").write_text(have.rstrip("\n") + "\n" + "\n".join(extra) + "\n")
 
     if not a.no_agents:
         (root / ".claude" / "agents").mkdir(parents=True, exist_ok=True)
@@ -138,8 +160,10 @@ def main():
             shutil.copy(f, root / ".claude" / "agents" / f.name)
 
     if a.engine == "godot":
-        for f in ["events.gd", "state.gd", "toon.gdshader"]:
+        for f in ["events.gd", "state.gd"]:
             shutil.copy(HERE / f, root / "shared" / f)
+        for f in ["gate.ps1", "net_test.ps1", "check_project.py"]:
+            shutil.copy(SCRIPTS / f, root / "tools" / "qa" / f)
         shutil.copy(HERE / "main_menu.gd", root / "ui/main_menu/main_menu.gd")
         (root / "ui/main_menu/main_menu.tscn").write_text(
             '[gd_scene load_steps=2 format=3]\n\n'
@@ -163,20 +187,22 @@ def main():
     for gk, ep in sorted(pairs, key=lambda x: x[1]):
         if gk in DESC:
             lines.append(f"- `{ep}/` - {DESC[gk]}")
-    lines += ["", "## Shared seams (the only abstraction allowed)", "", f"- {seams[0]}: signal bus.", f"- {seams[1]}: phase and score."]
+    lines += ["", "## Shared seams (the default abstraction; every extra global needs a DECISIONS.md row)", "", f"- {seams[0]}: signal bus.", f"- {seams[1]}: phase and score."]
     if networked:
         lines.append(f"- {seams[2]}: all multiplayer.")
     lines += ["", "## Where do I find...", "", "| I want to change... | Open |", "|---|---|", "| the title screen | ui/main_menu |",
-              "| game phase / score | the State seam |", "| the look of everything | shared/ (shader + palette) |"]
+              "| game phase / score | the State seam |", "| the look of everything | _project/ART_DIRECTION.md |",
+              "| how to run the checks | tools/qa/ |"]
     if networked:
         lines.append("| joining / room codes | the Net seam |")
     lines += ["| <<add a row per new script>> | |", "", "## How do I add a new...", "", "<<FILL a 5-line recipe per repeatable content type>>", ""]
     (root / "ARCHITECTURE.md").write_text("\n".join(lines))
     if not (root / "README.md").exists():
-        (root / "README.md").write_text(f"# {a.name}\n\n<<FILL one-line pitch>>\n\n## Run\n<<FILL for {ENGINE_NAMES[a.engine]} {ev}>>\n\n## How to play\n<<FILL>>\n\n## Where things are\nSee ARCHITECTURE.md. Design docs are in _project/.\n")
+        (root / "README.md").write_text(f"# {a.name}\n\n<<FILL one-line pitch>>\n\n## Run\n<<FILL for {ENGINE_NAMES[a.engine]} {ev}>>\n\n## How to play\n<<FILL>>\n\n## Where things are\nSee ARCHITECTURE.md. Design docs are in _project/. Current state: _project/HANDOFF.md.\n")
     print(f"Created {a.type} project '{a.name}' ({a.engine} {ev}, net={a.net}) at {root}")
     if a.engine != "godot":
         print("Note: no engine code stubs were generated; create Events/State/Net per references/engines.md section 4.")
-    print("Next: fill _project/GAME_VISION.md, then run scripts/check_project.py" + (" and scripts/gate_boot.sh" if a.engine == "godot" else ""))
+    print("Next: ask the user the art-direction questions and fill _project/GAME_VISION.md and ART_DIRECTION.md, then run the lint:")
+    print(f"  python -I {'tools/qa/check_project.py' if a.engine == 'godot' else 'scripts/check_project.py'} <project>")
 
 main()

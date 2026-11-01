@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "video_id": "pigeon_head_bob_demo",
+  "mode": "tpdossier_explainer",
+  "created_at": "2026-11-01T09:00:00Z",
+  "updated_at": "2026-11-01T11:30:00Z",
+  "lifecycle_status": "SCRIPTING",
+  "stages": {
+    "idea":       { "status": "PASS", "attempts": 1, "input_hash": "sha256:i0", "output_artifact_ids": ["idea_candidate"], "started_at": "2026-11-01T09:00:00Z", "finished_at": "2026-11-01T09:05:00Z", "checkpoint": "IDEA_APPROVED" },
+    "evidence":   { "status": "PASS", "attempts": 1, "input_hash": "sha256:e0", "output_artifact_ids": ["evidence_packet", "claim_ledger"], "started_at": "2026-11-01T09:05:00Z", "finished_at": "2026-11-01T09:40:00Z", "checkpoint": "EVIDENCE_VERIFIED" },
+    "script":     { "status": "PASS_WITH_WARNINGS", "attempts": 2, "input_hash": "sha256:s0", "output_artifact_ids": ["script_approved"], "started_at": "2026-11-01T09:40:00Z", "finished_at": "2026-11-01T10:20:00Z", "checkpoint": "SCRIPT_APPROVED" },
+    "beats":      { "status": "INVALIDATED", "attempts": 1, "input_hash": "sha256:b0", "output_artifact_ids": ["script_beats"], "started_at": "2026-11-01T10:20:00Z", "finished_at": "2026-11-01T10:30:00Z", "checkpoint": null },
+    "storyboard": { "status": "BLOCKED", "attempts": 0, "input_hash": null, "output_artifact_ids": [], "started_at": null, "finished_at": null, "checkpoint": null }
+  },
+  "artifacts": {
+    "idea_candidate":  { "artifact_id": "idea_candidate",  "kind": "idea", "path": "idea/candidate.json", "content_hash": "sha256:a1", "producer": "claude-agent", "producer_version": "1", "input_hashes": [], "status": "VALID" },
+    "evidence_packet": { "artifact_id": "evidence_packet", "kind": "evidence_packet", "path": "research/evidence_packet.json", "content_hash": "sha256:a2", "producer": "claude-agent", "producer_version": "1", "input_hashes": ["sha256:a1"], "status": "VALID" },
+    "claim_ledger":    { "artifact_id": "claim_ledger",    "kind": "claim_ledger", "path": "research/claim_ledger.json", "content_hash": "sha256:a3", "producer": "claude-agent", "producer_version": "1", "input_hashes": ["sha256:a2"], "status": "VALID" },
+    "script_approved": { "artifact_id": "script_approved", "kind": "script", "path": "script/approved.json", "content_hash": "sha256:a4-v2", "producer": "claude-agent", "producer_version": "1", "input_hashes": ["sha256:a2", "sha256:a3"], "status": "VALID", "metadata": { "supersedes": "sha256:a4-v1", "profile": "CURIOSITY_EXPLAINER" } },
+    "script_beats":    { "artifact_id": "script_beats",    "kind": "beats", "path": "beats/script_beats.json", "content_hash": "sha256:a5", "producer": "claude-agent", "producer_version": "1", "input_hashes": ["sha256:a4-v1"], "status": "SUPERSEDED" }
+  },
+  "approvals": [
+    { "gate": "idea_gate",     "status": "PASS", "timestamp": "2026-11-01T09:05:00Z", "reviewer": "claude-agent", "reasons": ["evidence probe VIABLE"], "repair_actions": [] },
+    { "gate": "evidence_gate", "status": "PASS", "timestamp": "2026-11-01T09:40:00Z", "reviewer": "claude-verifier-subagent", "reasons": [], "repair_actions": [] },
+    { "gate": "script_gate",   "status": "PASS_WITH_WARNINGS", "timestamp": "2026-11-01T10:20:00Z", "reviewer": "claude-agent", "reasons": ["title qualification lands at beat b_003"], "repair_actions": ["re-parse beats after script v2"] }
+  ],
+  "errors": [
+    { "error_id": "err_001", "stage": "beats", "code": "STALE_INPUT_HASH", "message": "script_approved hash changed after beats were produced", "retryable": true, "affected_artifact_ids": ["script_beats"], "attempt": 1, "timestamp": "2026-11-01T11:30:00Z" }
+  ],
+  "dependency_graph": {
+    "idea_candidate": ["evidence_packet"],
+    "evidence_packet": ["claim_ledger", "script_approved"],
+    "claim_ledger": ["script_approved"],
+    "script_approved": ["script_beats"],
+    "script_beats": []
+  },
+  "analytics": {}
+}

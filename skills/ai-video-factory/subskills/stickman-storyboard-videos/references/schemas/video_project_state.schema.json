@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.pipeline/schemas/video_project_state.schema.json",
+  "title": "Video Project Persistent State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "video_id", "mode", "created_at", "updated_at", "lifecycle_status", "stages", "artifacts", "approvals", "errors", "dependency_graph"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "video_id": {"type": "string"},
+    "mode": {"type": "string", "enum": ["tpdossier_explainer", "shorts_factory", "other"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "lifecycle_status": {"type": "string", "enum": ["IDEA", "RESEARCHING", "SCRIPTING", "STORYBOARDING", "ASSET_BUILD", "RENDERING", "REVIEW", "APPROVED", "SCHEDULED", "PUBLISHED", "FAILED", "PAUSED"]},
+    "stages": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/stage"}
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/artifact"}
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["gate", "status", "timestamp"],
+        "properties": {
+          "gate": {"type": "string"},
+          "status": {"type": "string", "enum": ["PASS", "PASS_WITH_WARNINGS", "REVISE", "FAIL"]},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "reviewer": {"type": ["string", "null"]},
+          "reasons": {"type": "array", "items": {"type": "string"}},
+          "repair_actions": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["error_id", "stage", "code", "message", "retryable", "timestamp"],
+        "properties": {
+          "error_id": {"type": "string"},
+          "stage": {"type": "string"},
+          "code": {"type": "string"},
+          "message": {"type": "string"},
+          "retryable": {"type": "boolean"},
+          "affected_artifact_ids": {"type": "array", "items": {"type": "string"}},
+          "attempt": {"type": "integer", "minimum": 1},
+          "timestamp": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "dependency_graph": {
+      "type": "object",
+      "description": "Artifact DAG. A changed upstream content hash invalidates only reachable downstream artifacts.",
+      "additionalProperties": {
+        "type": "array", "items": {"type": "string"}
+      }
+    },
+    "analytics": {"type": "object", "additionalProperties": true, "default": {}}
+  },
+  "$defs": {
+    "stage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "attempts", "input_hash", "output_artifact_ids"],
+      "properties": {
+        "status": {"type": "string", "enum": ["NOT_STARTED", "READY", "RUNNING", "PASS", "PASS_WITH_WARNINGS", "REVISE", "FAIL", "BLOCKED", "INVALIDATED"]},
+        "attempts": {"type": "integer", "minimum": 0},
+        "input_hash": {"type": ["string", "null"]},
+        "output_artifact_ids": {"type": "array", "items": {"type": "string"}},
+        "started_at": {"type": ["string", "null"], "format": "date-time"},
+        "finished_at": {"type": ["string", "null"], "format": "date-time"},
+        "checkpoint": {"type": ["string", "null"]}
+      }
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["artifact_id", "kind", "path", "content_hash", "producer", "producer_version", "input_hashes", "status"],
+      "properties": {
+        "artifact_id": {"type": "string"},
+        "kind": {"type": "string"},
+        "path": {"type": "string"},
+        "content_hash": {"type": "string"},
+        "producer": {"type": "string"},
+        "producer_version": {"type": "string"},
+        "input_hashes": {"type": "array", "items": {"type": "string"}},
+        "status": {"type": "string", "enum": ["PLANNED", "VALID", "INVALID", "MISSING", "SUPERSEDED"]},
+        "provenance_id": {"type": ["string", "null"]},
+        "metadata": {"type": "object", "additionalProperties": true}
+      }
+    }
+  }
+}

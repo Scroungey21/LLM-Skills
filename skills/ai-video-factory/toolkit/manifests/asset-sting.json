@@ -1,0 +1,11 @@
+{
+  "component_name": "asset-sting",
+  "visual_kind": "asset-animation",
+  "text_heavy": false,
+  "max_typing_speed_cps": 0,
+  "max_nodes": 0,
+  "min_scene_ms": 750,
+  "max_scene_ms": 2000,
+  "max_animation_duration_ms": 2000,
+  "elements": []
+}

@@ -1,0 +1,10 @@
+{
+  "component_name": "citation-badge",
+  "visual_kind": "citation-badge",
+  "text_heavy": true,
+  "max_typing_speed_cps": 26,
+  "max_nodes": 0,
+  "min_scene_ms": 2000,
+  "max_scene_ms": 4500,
+  "elements": []
+}

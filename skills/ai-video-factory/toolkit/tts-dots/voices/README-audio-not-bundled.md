@@ -1,0 +1,1 @@
+﻿Voice reference audio is NOT bundled in the packaged skill. See references/voice-tts.md; supply your own authorised reference audio + transcript (DOTS_TTS_REFERENCE_AUDIO / DOTS_TTS_REFERENCE_TEXT). One house voice is a real person's voice: do not redistribute it.

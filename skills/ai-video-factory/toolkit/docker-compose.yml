@@ -1,0 +1,136 @@
+﻿# Bundled TTS / voice-lab stack (ai-video-factory toolkit). Run from this directory:
+#   docker compose up -d tts                              # technews voice (port 8004)
+#   docker compose --profile hidden-systems up -d tts-hidden   # Hidden Everyday Systems voice (port 8005)
+#   docker compose --profile voicestudio up -d voicestudio     # optional voice lab (port 3900)
+# 	ts and 	ts-hidden load a full dots.tts SOAR model into VRAM each: NEVER run both at once --
+# stop one before starting the other. The 
+ame: pin keeps container names (yttechnews-tts-1,
+# yttechnews-voicestudio-1) stable; the HES 3D pipeline's voice_lock.py docks into
+# yttechnews-voicestudio-1.
+# The technews engine/console services were removed in the 2026-11 reduction (their source is
+# in git tag pre-skill-reduction; see references/legacy-and-removed.md in the skill).
+# Put a .env next to this file (see references/environment-setup.md) for VOICESTUDIO_API_KEY etc.
+name: yttechnews
+
+services:
+  # --- TTS (dots.tts SOAR, reviewed warm educational house voice) ---
+  tts:
+    build:
+      context: .
+      dockerfile: tts-dots/Dockerfile
+    ports:
+      - "8004:8004"
+    volumes:
+      - tts_model_cache:/root/.cache/huggingface
+      # Keep the reviewed service implementation identical to the workspace during iteration.
+      # The same file is also COPY'd by the image for standalone/release builds.
+      - ./tts-dots/server.py:/app/server.py:ro
+      - ./tts-dots/voices:/app/voices:ro
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      DOTS_TTS_MODEL: ${DOTS_TTS_MODEL:-dots-studio/dots.tts-soar}
+      DOTS_TTS_VOICE_ID: ${DOTS_TTS_VOICE_ID:-warm-informational}
+      DOTS_TTS_REFERENCE_AUDIO: /app/voices/warm-informational.wav
+      DOTS_TTS_REFERENCE_TEXT: /app/voices/warm-informational.txt
+      DOTS_TTS_PRECISION: ${DOTS_TTS_PRECISION:-bfloat16}
+      DOTS_TTS_OPTIMIZE: ${DOTS_TTS_OPTIMIZE:-0}
+      DOTS_TTS_NUM_STEPS: ${DOTS_TTS_NUM_STEPS:-16}
+      DOTS_TTS_GUIDANCE_SCALE: ${DOTS_TTS_GUIDANCE_SCALE:-1.2}
+      DOTS_TTS_SPEAKER_SCALE: ${DOTS_TTS_SPEAKER_SCALE:-1.5}
+      DOTS_TTS_SEED: ${DOTS_TTS_SEED:-20260829}
+      DOTS_TTS_CHUNK_MAX_WORDS: ${DOTS_TTS_CHUNK_MAX_WORDS:-56}
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/api/model-info', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 600s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # --- TTS for Hidden Everyday Systems (dots.tts SOAR, distinct house voice) ---
+  # Behind the `hidden-systems` profile so a bare `docker compose up` never starts this
+  # alongside `tts` -- see the file-header comment. Start with:
+  #   docker compose --profile hidden-systems up -d tts-hidden
+  # after confirming `tts` is stopped.
+  tts-hidden:
+    profiles: ["hidden-systems"]
+    build:
+      context: .
+      dockerfile: tts-dots/Dockerfile
+    ports:
+      - "8005:8004"
+    volumes:
+      - tts_model_cache:/root/.cache/huggingface
+      - ./tts-dots/server.py:/app/server.py:ro
+      - ./tts-dots/voices:/app/voices:ro
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      DOTS_TTS_MODEL: ${DOTS_TTS_MODEL:-dots-studio/dots.tts-soar}
+      DOTS_TTS_VOICE_ID: hidden-systems-informational
+      DOTS_TTS_REFERENCE_AUDIO: /app/voices/hidden-systems-informational.wav
+      DOTS_TTS_REFERENCE_TEXT: /app/voices/hidden-systems-informational.txt
+      DOTS_TTS_PRECISION: ${DOTS_TTS_PRECISION:-bfloat16}
+      DOTS_TTS_OPTIMIZE: ${DOTS_TTS_OPTIMIZE:-0}
+      DOTS_TTS_NUM_STEPS: ${DOTS_TTS_NUM_STEPS:-16}
+      DOTS_TTS_GUIDANCE_SCALE: ${DOTS_TTS_GUIDANCE_SCALE:-1.2}
+      DOTS_TTS_SPEAKER_SCALE: ${DOTS_TTS_SPEAKER_SCALE:-1.5}
+      DOTS_TTS_SEED: ${HIDDEN_SYSTEMS_TTS_SEED:-40000002}
+      DOTS_TTS_CHUNK_MAX_WORDS: ${DOTS_TTS_CHUNK_MAX_WORDS:-56}
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/api/model-info', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 600s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # --- VoiceStudio (optional, shared by all channels; added 2026-09-27) ---
+  # https://github.com/debpalash/VoiceStudio (AGPL-3.0; each engine's model has its own licence).
+  # Local voice design / cloning / expressive TTS lab with a REST API + web UI on
+  # http://127.0.0.1:3900 (engines: OmniVoice default, CosyVoice 3, VoxCPM2, IndexTTS 2.5, dots.tts, ...).
+  # It does NOT replace any channel's narration backend; channels opt in per their own pipeline docs.
+  # Behind the `voicestudio` profile so a bare `docker compose up` never starts it. It shares the one GPU
+  # with `tts` / `tts-hidden` -- check free VRAM first. Start / stop:
+  #   docker compose --profile voicestudio up -d voicestudio
+  #   docker compose --profile voicestudio stop voicestudio
+  # Client + usage notes: voicestudio/README.md
+  voicestudio:
+    profiles: ["voicestudio"]
+    image: ghcr.io/debpalash/voicestudio:${VOICESTUDIO_TAG:-0.5.6}
+    ports:
+      - "127.0.0.1:3900:3900"
+    volumes:
+      - voicestudio_data:/app/omnivoice_data
+      - voicestudio_hf_cache:/root/.cache/huggingface
+    environment:
+      # Plain default (not `:?`): Compose interpolates every service, so a required var here would break a bare `up`.
+      OMNIVOICE_API_KEY: ${VOICESTUDIO_API_KEY:-}
+      OMNIVOICE_SERVER_MODE: "1"
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  tts_model_cache:
+  voicestudio_data:
+  voicestudio_hf_cache:

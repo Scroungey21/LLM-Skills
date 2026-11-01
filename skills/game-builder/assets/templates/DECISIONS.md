@@ -1,5 +1,6 @@
 # Decisions Log - {{NAME}}
-Cheap-to-reverse choices are decided by the agent and logged here. Expensive ones are asked first.
-Format:  D-### | decision | reason | reversible? | edge cases it covers
+Cheap-to-reverse choices are decided by the agent and logged here. Expensive ones are asked first. Put the user's own words in the last column whenever they gave any.
 
-D-001  Engine = {{ENGINE_NAME}}.   Reason: <<FILL why this engine>>.   Reversible: no.
+| ID | Decision | Reason | Reversible? | Covers (edge cases, files) | User's words (verbatim) |
+|---|---|---|---|---|---|
+| D-001 | Engine = {{ENGINE_NAME}} | <<FILL why this engine>> | no | everything | <<FILL or "agent decision">> |

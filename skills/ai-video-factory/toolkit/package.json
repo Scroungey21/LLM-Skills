@@ -1,0 +1,8 @@
+﻿{
+  "name": "ai-video-factory-toolkit",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Workspace root for the bundled Remotion renderer. Run `npm install` (or pnpm install) here, then render from renderer/. Channel media is read from hidden-everyday-systems/renderer-public (override with YT_PUBLIC_DIR).",
+  "workspaces": ["renderer", "packages/*"],
+  "engines": { "node": ">=20" }
+}

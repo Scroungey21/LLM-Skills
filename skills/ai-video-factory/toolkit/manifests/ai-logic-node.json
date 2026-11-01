@@ -1,0 +1,10 @@
+{
+  "component_name": "ai-logic-node",
+  "visual_kind": "topology-graph",
+  "text_heavy": false,
+  "max_typing_speed_cps": 0,
+  "max_nodes": 16,
+  "min_scene_ms": 1000,
+  "max_scene_ms": 15000,
+  "elements": []
+}

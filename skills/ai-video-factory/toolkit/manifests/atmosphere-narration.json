@@ -1,0 +1,12 @@
+{
+  "component_name": "atmosphere-narration",
+  "max_typing_speed_cps": 0,
+  "max_nodes": 0,
+  "min_scene_ms": 2000,
+  "max_scene_ms": 30000,
+  "elements_required": true,
+  "elements": [
+    {"name": "foreground_textbox", "description": "Transparent textbox whose text progressively reveals at narration speed, windowed against real WhisperX word timestamps -- never a synthetic typing-speed animation"},
+    {"name": "background_layer", "description": "Blurred, license-clear Tier 0-2 stock/asset footage contextually matched to the narrated segment, rotating through a pool of clips bounded by background_variety"}
+  ]
+}
