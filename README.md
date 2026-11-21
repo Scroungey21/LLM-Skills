@@ -12,21 +12,31 @@ Each skill is self-contained in its own independent folder and includes its own 
 .
 ├── skills/
 │   ├── aggregate-deep-research/
+│   ├── ai-video-factory/
 │   ├── app-idea-to-build-prompt/
+│   ├── code-discipline/
 │   ├── context-handoff/
 │   ├── context-resume/
+│   ├── exam-answer-guide/
+│   ├── exam-variants-pack/
+│   ├── explain-code/
 │   ├── external-delegation/
 │   ├── galacticus-maker/
 │   ├── galacticus-pathway/
 │   ├── game-builder/
 │   ├── game-idea-to-build-prompt/
 │   ├── ghosty-spec/
+│   ├── learning-animation-maker/
+│   ├── mass-game-builder/
+│   ├── minimal-code/
+│   ├── model-routing/
 │   ├── project-uphaul/
+│   ├── revision-project-export/
 │   ├── scenario-coverage-testing/
 │   ├── subject-full-guide/
 │   └── yt-deep-extraction/
 ├── claude-web-skills/
-│   └── *.skill (packaged web skills)
+│   └── *.skill (packaged web skills, one per skill above)
 └── README.md
 ```
 
@@ -144,6 +154,67 @@ Guides a discussion that settles a game's vision, mechanics, style, engine, and 
 - **Verified Prompt:** Includes a checker script and a worked example; the prompt is self-contained.
 - **Companion:** Pairs with `game-builder`, but works without it.
 *Use this when pitching a game idea and you want a ready-to-hand-off build prompt.*
+
+### 15. `mass-game-builder`
+**Master Game-Building Skill**
+Builds complete, playable, polished, human-readable games of any genre, theme, and art direction (2D or 3D, solo or multiplayer; Godot, Unity, or Unreal) with one fixed architecture, strict quality gates, and a vetted toolchain.
+- **Optional Modules:** Idea research and vision speccing, a step-by-step build loop, juice and polish, playtesting, and audit/remaster/remake.
+- **Extended References:** Godot MCP, Blender MCP, and asset generators, plus guidance on clipping and collision, recorded audio, multiplayer security, balance, UI fit, and QA gates.
+*Use this as the broader sibling of `game-builder` when you want the full pipeline from idea to release.*
+
+### 16. `minimal-code`
+**"Minimal Code, Maximal Power" Coding Philosophy**
+Writes, fixes, reviews, and refactors code with the fewest files, functions, and lines that still read clearly: one place per job, no wrapper or tape-function patches, readable by a beginner without memorizing the codebase.
+- **Anti-Bloat:** Applies whenever the urge arises to add a helper, wrapper, utils file, abstraction, config layer, or workaround.
+- **Companion:** Pairs with `game-builder` and `mass-game-builder`.
+*Use this for any build, debug, refactor, or review request on an app, site, script, tool, bot, API, or game.*
+
+### 17. `code-discipline`
+**Navigable-Codebase Architecture Contract**
+Builds, reviews, and audits any codebase (any language or architecture) so every file is findable in a minute and the whole project is learnable in under an hour.
+- **Enforced Conventions:** A written architecture contract, one file per owned thing, full-word names, a header plus three ordered banners per file, short plain functions, and scale-ready stateless key-value data.
+- **Navigation Kit & Checker:** `ARCHITECTURE.md`, `AGENTS.md`, `DECISIONS.md`, and a checker script.
+*Use this for clean, readable, easily handed-over codebases.*
+
+### 18. `explain-code`
+**Codebase Explainer**
+Explains a codebase so the reader understands it as if they wrote it.
+- **Deliverables:** A step-by-step guide, UML diagrams, and an animated arcade-style HTML file-flow explainer.
+*Use this for "explain/understand this code" requests.*
+
+### 19. `model-routing`
+**Sub-Agent Model & Effort Routing**
+Chooses the model and reasoning effort for every sub-agent in long-horizon, multi-agent work, so top-tier tokens go only where they pay off.
+- **Routing Table:** Finds the project's routing table, or builds one by asking a few questions fitted to the project.
+- **Applied Per Stage:** Sets `model` and `effort` on every agent call and workflow `agent()` call.
+*Use this before launching several sub-agents, writing or resuming a workflow script, or planning a multi-phase job. Not needed for a single quick sub-agent.*
+
+### 20. `ai-video-factory`
+**AI-Assisted YouTube Video Pipeline**
+Plans, produces, QAs, and schedules AI-assisted YouTube videos and Shorts of many types: tech-news and everyday-mechanism explainers (2D/Blender 3D), physics-simulation Shorts, found-clip caption cards, 10-hour ambient videos, and theme formats (horror stories, manga recaps, chat stories, stickman storyboards, and more).
+- **Bundled Tooling:** Pipelines, quality gates, a toolkit (dots.tts server, Remotion, VoiceStudio client), and release-calendar tooling.
+*Use this to make, script, voice, render, review, schedule, or upload a video, or to start a new channel or format.*
+
+### 21. `learning-animation-maker`
+**ADHD-Friendly Learning Product Builder**
+Builds a full-coverage learning product for any subject.
+- **Contents:** An animated story, mechanic-based sandbox games scored by real simulators, a pathway mode, and 2h/4h mock exams.
+*Use this when the learner should be able to pass using the product alone.*
+
+### 22. `exam-answer-guide`
+**Open-Book Exam Cheat Sheet**
+Builds a dense, printable open-book exam answer guide from course documents and past papers, modelled on how the professor designs exams (LaTeX → PDF).
+*Use this for an answer guide, cheat sheet, or formula sheet.*
+
+### 23. `exam-variants-pack`
+**Past Exam → Correction + Variant Mocks**
+Turns a past exam (photos, PDF, or text) into a typeset exam with a full step-by-step correction, a model of how the professor designs exams, and variant mock exams in the same format with full corrections, all in one LaTeX PDF.
+*Use this for past papers, "correct this exam", or "make variants".*
+
+### 24. `revision-project-export`
+**Revision Project Packager**
+Packages a revision or study project (course inputs, generated guides and PDFs, sources, HTML artifacts, docs) into one zip with a handoff and a paste-ready context prompt.
+*Use this to export, back up, move, or hand off a project to another account or chat.*
 
 ## How to Use
 
