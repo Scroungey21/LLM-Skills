@@ -1,0 +1,69 @@
+\documentclass[8pt,a4paper]{extarticle}
+\usepackage[a4paper,margin=9mm,top=12mm,bottom=10mm,headheight=10pt,headsep=4pt,footskip=12pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Carlito}
+\setsansfont{Carlito}
+\setmonofont{DejaVu Sans Mono}[Scale=0.86]
+\usepackage{amsmath,amssymb}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs,tabularx,array,multicol,colortbl}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{bookmark}
+\usepackage{ragged2e}
+\definecolor{ink}{HTML}{141B26}\definecolor{muted}{HTML}{5E697C}\definecolor{rule}{HTML}{C9D1DC}
+\definecolor{accent}{HTML}{2446C8}\definecolor{accentsoft}{HTML}{E6ECFD}
+\definecolor{warn}{HTML}{A8460C}\definecolor{warnsoft}{HTML}{FCEFE4}\definecolor{ok}{HTML}{157347}\definecolor{oksoft}{HTML}{E5F4EA}
+\definecolor{codebg}{HTML}{F4F6F9}\definecolor{kw}{HTML}{1F3FAF}\definecolor{mpi}{HTML}{0B7A6A}\definecolor{com}{HTML}{6F7D96}\definecolor{str}{HTML}{A4461C}
+\definecolor{zebra}{HTML}{F3F5F8}
+\setlength{\columnsep}{9pt}\setlength{\columnseprule}{0.3pt}\renewcommand{\columnseprulecolor}{\color{rule}}
+\setlength{\parindent}{0pt}\setlength{\parskip}{1.5pt}
+\newcommand{\secbox}[1]{\colorbox{accent}{\parbox{\dimexpr\linewidth-2\fboxsep}{\strut\thesection\quad #1}}}
+\titleformat{\section}{\sffamily\bfseries\large\color{white}}{}{0pt}{\secbox}
+\titlespacing*{\section}{0pt}{5pt}{3pt}
+\titleformat{\subsection}{\sffamily\bfseries\normalsize\color{accent}}{\thesubsection}{0.4em}{}[\vspace{-1pt}{\color{accent}\titlerule[0.5pt]}]
+\titlespacing*{\subsection}{0pt}{4pt}{2pt}
+\titleformat{\subsubsection}{\sffamily\bfseries\small\color{ink}}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{3pt}{1pt}
+\renewcommand{\thesection}{\Alph{section}}\renewcommand{\thesubsection}{\thesection\arabic{subsection}}
+\lstdefinestyle{c}{language=C,basicstyle=\ttfamily\fontsize{7.5}{8.3}\selectfont,keywordstyle=\color{kw}\bfseries,commentstyle=\color{com}\itshape,stringstyle=\color{str},
+  morekeywords={size_t,MPI_Comm,MPI_Status,MPI_Request,MPI_Datatype,MPI_Op,shared,upc_forall,upc_barrier,upc_memget,upc_memput,MYTHREAD,THREADS,__global__,__device__,__host__,__shared__,__syncthreads,dim3,cudaError_t,cudaEvent_t,u64},
+  emph={MPI_Init,MPI_Finalize,MPI_Comm_rank,MPI_Comm_size,MPI_Send,MPI_Recv,MPI_Sendrecv,MPI_Isend,MPI_Irecv,MPI_Wait,MPI_Waitall,MPI_Bcast,MPI_Scatter,MPI_Scatterv,MPI_Gather,MPI_Gatherv,MPI_Reduce,MPI_Allreduce,MPI_Allgather,MPI_Alltoall,MPI_Scan,MPI_Exscan,MPI_Barrier,MPI_Wtime,MPI_COMM_WORLD,MPI_INT,MPI_SUM,MPI_MAX,cudaMalloc,cudaMemcpy,cudaFree,cudaMemset,cudaMemcpyHostToDevice,cudaMemcpyDeviceToHost,atomicAdd,atomicMin,atomicMax,blockIdx,blockDim,threadIdx,gridDim},emphstyle=\color{mpi}\bfseries,
+  backgroundcolor=\color{codebg},frame=leftline,rulecolor=\color{accent},framerule=1.2pt,framesep=3pt,xleftmargin=4pt,xrightmargin=0pt,aboveskip=2pt,belowskip=2pt,
+  numbers=none,breaklines=true,breakindent=10pt,columns=fullflexible,keepspaces=true,showstringspaces=false,upquote=true}
+\lstset{style=c}
+\lstnewenvironment{code}[1][]{\lstset{style=c,#1}}{}
+\newcommand{\blk}[2][0]{\lstinputlisting{../code/blocks/#2.txt}}
+\newcommand{\codefile}{mpi_blocks.c}
+\newcommand{\inl}[1]{\lstinline{#1}}
+\tcbset{enhanced,breakable,sharp corners,boxrule=0.4pt,left=3pt,right=3pt,top=2pt,bottom=2pt,fonttitle=\sffamily\bfseries\small,toptitle=0.5pt,bottomtitle=0.5pt,before skip=3pt,after skip=3pt}
+\newtcolorbox{key}[1][Key]{colback=accentsoft!50,colframe=accent,title={#1},coltitle=white}
+\newtcolorbox{trap}[1][Traps]{colback=warnsoft,colframe=warn,title={#1},coltitle=white}
+\newtcolorbox{ex}[1]{colback=white,colframe=ok,colbacktitle=ok,coltitle=white,title={#1}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\tb}{\rowcolors{2}{zebra}{white}\renewcommand{\arraystretch}{1.12}\setlength{\tabcolsep}{2.6pt}}
+\newcommand{\hd}[1]{\rowcolor{ink!10}#1}
+\newcommand{\T}[1]{\texttt{#1}}
+\newcommand{\B}[1]{\textbf{#1}}
+\newcommand{\W}[1]{{\color{warn}#1}}
+\newcommand{\G}[1]{{\color{ok}#1}}
+\newcommand{\nb}[1]{{\color{muted}\scriptsize #1}}
+\newcommand{\cg}[1]{\begin{tikzpicture}[scale=0.36,baseline=(current bounding box.center),every node/.style={font=\fontsize{5.5}{6}\selectfont,inner sep=0pt}]\draw[step=1,color=ink!60,line width=0.2pt] (0,0) grid (4,-4);\foreach \r/\c/\t in {#1} \node at (\c+0.5,-\r-0.5) {$\t$};\end{tikzpicture}}
+\newcommand{\cop}[2]{\cg{#1}\,{\small$\Rightarrow$}\,\cg{#2}}
+\setlist{leftmargin=10pt,itemsep=0pt,topsep=1pt,parsep=0pt}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\sffamily\scriptsize\color{muted}Parallel Programming S7 · exam answer guide (all documents allowed)}\fancyhead[R]{\sffamily\scriptsize\color{muted}\leftmark}\fancyfoot[C]{\sffamily\scriptsize\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\sectionmark}[1]{\markboth{\thesection\ · #1}{}}
+\sloppy\raggedcolumns
+\AtBeginDocument{\RaggedRight\setlength{\parindent}{0pt}}
+\tcbset{before upper=\RaggedRight}
+\newcommand{\dl}[2]{\par\hangindent=7pt\hangafter=1\noindent{\color{accent}\textbf{#1}}\enspace #2\par\vspace{0.6pt}}
+\newcommand{\dlx}[3]{\par\hangindent=7pt\hangafter=1\noindent{\color{accent}\textbf{#1}}\enspace #2\enspace{\color{muted}$\triangleright$\,\textit{#3}}\par\vspace{0.6pt}}
+\newcommand{\dlh}[1]{\par\noindent{\scriptsize\sffamily\color{muted}#1}\par}

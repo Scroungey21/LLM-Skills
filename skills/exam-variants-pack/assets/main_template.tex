@@ -1,0 +1,27 @@
+\input{preamble}
+\newif\ifsol
+\IfFileExists{solflag.tex}{\input{solflag}}{\soltrue}
+\begin{document}
+\begin{titlepage}
+\vspace*{2.5cm}
+{\sffamily\color{muted}\large Parallel Programming · S7}\par\vspace{6pt}
+{\sffamily\bfseries\Huge\color{ink}Real-format exam pack}\par\vspace{10pt}
+{\Large \ifsol Past exam with step-by-step correction,\\ the professor model, and three mock exams with full corrections\else Exam papers only (past exam + mocks A, B, C)\fi}\par\vspace{1.5cm}
+\begin{tcolorbox}[colback=accentsoft!40,colframe=accent,title=How to use it]
+Sit each paper in \textbf{2 hours}, on paper, closed book. \ifsol Then mark yourself with the corrections: every answer shows the chain \textbf{Read $\to$ Link $\to$ Adapt $\to$ Iterate $\to$ Write}, the traps and the marking scheme.\fi\ Start with the past exam, then A, B, C. Points: Ex1 3 · Ex2 3 · Ex3 10 (MPI 4, UPC 3, CUDA 3) · Ex4 4 = 20.
+\end{tcolorbox}
+\vfill
+{\small\color{muted} MPI and CUDA answers were compiled and run (OpenMPI; CUDA through a CPU emulator). UPC answers follow the UPC 1.3 specification; no UPC compiler was available, so they are not run. Parts of the past exam missing from the photos are reconstructed and marked.}
+\end{titlepage}
+\tableofcontents
+\clearpage
+\ifsol\input{model}\clearpage\fi
+\input{exam0_paper}\clearpage
+\ifsol\input{exam0_sol}\clearpage\fi
+\input{mockA_paper}\clearpage
+\ifsol\input{mockA_sol}\clearpage\fi
+\input{mockB_paper}\clearpage
+\ifsol\input{mockB_sol}\clearpage\fi
+\input{mockC_paper}\clearpage
+\ifsol\input{mockC_sol}\fi
+\end{document}

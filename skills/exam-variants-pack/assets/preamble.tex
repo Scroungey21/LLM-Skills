@@ -1,0 +1,60 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,margin=2.1cm,headheight=22pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Caladea}
+\setsansfont{DejaVu Sans}[Scale=0.9]
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{amsmath,amssymb}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs,tabularx,array,longtable}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{bookmark}
+\definecolor{ink}{HTML}{141B26}\definecolor{muted}{HTML}{5E697C}\definecolor{rule}{HTML}{D6DCE5}
+\definecolor{accent}{HTML}{2446C8}\definecolor{accentsoft}{HTML}{E3E9FD}
+\definecolor{warn}{HTML}{A8460C}\definecolor{warnsoft}{HTML}{FDF0E6}\definecolor{ok}{HTML}{157347}\definecolor{oksoft}{HTML}{E3F4EA}
+\definecolor{codebg}{HTML}{F5F7FA}\definecolor{kw}{HTML}{1F3FAF}\definecolor{mpi}{HTML}{0B7A6A}\definecolor{com}{HTML}{6F7D96}\definecolor{str}{HTML}{A4461C}
+\definecolor{rzero}{HTML}{D9531E}\definecolor{rone}{HTML}{0E8C7E}\definecolor{rtwo}{HTML}{6B4FD8}\definecolor{rthree}{HTML}{B98300}
+\titleformat{\part}[display]{\sffamily\bfseries\Huge\color{accent}}{\large\color{muted}PART \thepart}{6pt}{}
+\titleformat{\section}{\sffamily\bfseries\Large\color{ink}}{\color{accent}\thesection}{0.6em}{}
+\titleformat{\subsection}{\sffamily\bfseries\large\color{ink}}{\color{accent}\thesubsection}{0.6em}{}
+\lstdefinestyle{c}{language=C,basicstyle=\ttfamily\small,keywordstyle=\color{kw}\bfseries,commentstyle=\color{com}\itshape,stringstyle=\color{str},
+  morekeywords={size_t,MPI_Comm,MPI_Status,shared,upc_forall,upc_barrier,MYTHREAD,THREADS,__global__,__device__,__shared__,__syncthreads,dim3},
+  emph={MPI_Init,MPI_Finalize,MPI_Comm_rank,MPI_Comm_size,MPI_Send,MPI_Recv,MPI_Bcast,MPI_Scatter,MPI_Gather,MPI_Reduce,MPI_Allreduce,MPI_COMM_WORLD,MPI_INT,MPI_SUM,cudaMalloc,cudaMemcpy,cudaFree,cudaMemset,cudaMemcpyHostToDevice,cudaMemcpyDeviceToHost,atomicAdd,blockIdx,blockDim,threadIdx,gridDim},emphstyle=\color{mpi}\bfseries,
+  backgroundcolor=\color{codebg},frame=single,rulecolor=\color{rule},framesep=4pt,xleftmargin=6pt,xrightmargin=6pt,
+  numbers=none,breaklines=true,columns=fullflexible,keepspaces=true,showstringspaces=false,upquote=true,literate={…}{{\ldots}}1}
+\lstset{style=c}
+\lstnewenvironment{code}[1][]{\lstset{style=c,#1}}{}
+\tcbset{enhanced,breakable,sharp corners=south,arc=3pt,boxrule=0.5pt,left=8pt,right=8pt,top=6pt,bottom=6pt,fonttitle=\sffamily\bfseries}
+\newtcolorbox{model}[1][]{colback=accentsoft!45,colframe=accent,title={#1},coltitle=white}
+\newtcolorbox{watch}[1][Watch out]{colback=warnsoft,colframe=warn,title={#1},coltitle=white}
+\newtcolorbox{solution}[1]{colback=white,colframe=ok,colbacktitle=ok,coltitle=white,title={Correction · #1}}
+\newtcolorbox{instr}{colback=codebg,colframe=ink,title={Instructions}}
+\newcommand{\cs}[1]{\par\smallskip\noindent{\sffamily\bfseries\small\color{accent}#1}\enspace}
+\newcommand{\Read}{\cs{1 · Read.}}
+\newcommand{\Link}{\cs{2 · Link.}}
+\newcommand{\Adapt}{\cs{3 · Adapt.}}
+\newcommand{\Iterate}{\cs{4 · Iterate and check.}}
+\newcommand{\Write}{\cs{5 · Write (model answer).}}
+\newcommand{\Trap}{\cs{Traps.}}
+\newcommand{\Marks}{\cs{Marking.}}
+\newcommand{\lines}[1]{\par\vspace{2pt}\foreach \k in {1,...,#1}{\noindent\makebox[\linewidth]{\dotfill}\par\vspace{5pt}}}
+\newcommand{\q}[2]{\par\medskip\noindent\textbf{#1}~#2}
+\newcommand{\ex}[2]{\subsection*{#1 \hfill #2}}
+\newcommand{\beyond}[1]{{\sffamily\scriptsize\color{warn}[#1]}}
+% collective-operation grids: rows = processes, columns = data
+\newcommand{\cgrid}[1]{\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]
+  \draw[step=1,color=ink!70] (0,0) grid (4,-4);
+  \foreach \r/\c/\t in {#1} \node at (\c+0.5,-\r-0.5) {$\t$};
+\end{tikzpicture}}
+\newcommand{\cop}[3]{\par\noindent\begin{tabular}{@{}c@{\quad}c@{\quad}c@{\quad}l@{}}\cgrid{#1} & $\Longrightarrow$ & \cgrid{#2} & #3\end{tabular}\par\smallskip}
+\newcommand{\caxes}{{\sffamily\scriptsize\color{muted} rows = processes $P_0..P_3$ (top to bottom), columns = data items (left to right)}\par}
+\sloppy
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\sffamily\scriptsize\color{muted}Parallel Programming · S7 · exam pack}\fancyhead[R]{\sffamily\scriptsize\color{muted}\leftmark}\fancyfoot[C]{\sffamily\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
