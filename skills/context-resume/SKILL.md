@@ -1,49 +1,54 @@
 ---
 name: context-resume
-description: Loads a context-handoff export (a handoff.md / handoff.json / *-handoff.zip produced by the context-handoff skill) at the start of a new conversation so work can continue with full prior context instead of starting cold or asking the user to re-explain everything. Use this whenever the user uploads or references a file named like "*-handoff.zip", "handoff.md", or "handoff.json", says things like "resume this conversation," "continue from this handoff," "load this context," or "here's where we left off," or shares a project handoff file at the start of a session. Always run this before doing any requested work in that conversation, not after.
+description: Loads a handoff made by the context-handoff skill (HANDOFF.md + handoff.json, a *-handoff.zip, or an older handoff.md/handoff.json transcript export) at the start of a new conversation, checks it against the real files on disk, and continues the work. Use when the user attaches or points to such files, or says "resume", "continue from this handoff", "load this context" or "here's where we left off". Run it before any other work in that conversation.
 ---
 
-# Context Resume
+# Context Resume (v2, matches context-handoff v2)
 
-The receiving-end counterpart to `context-handoff`. Its job is to load a handoff package correctly — respecting its coverage limits and settled decisions — rather than treating it as loose background reading.
+The receiving side of `context-handoff`. Load the handoff, **check it against reality**, confirm in a few lines,
+then continue as if the history were your own.
 
-## Workflow
+## 1. Find and read
 
-### 1. Locate and read the files
+- Unzip a `*-handoff.zip` first if given.
+- **v2 (work-state):** `HANDOFF.md` + `handoff.json` (`"handoff_version": 2`). Read HANDOFF.md fully; use the JSON
+  for paths, commands and item lists.
+- **v1 (transcript export):** `handoff.md` + `handoff.json` with `turns`. Read the preamble (settled decisions,
+  open questions), then the turns. v1 coverage notes about "earlier turns not recoverable" may be outdated: check
+  for a transcript file before believing them.
+- Read every skill or instruction file the handoff tells you to read (for example a project `SKILL.md`) before
+  touching the work.
 
-Prefer the zip if present; unzip it, then read `handoff.json` first (canonical), then `handoff.md` (human-readable view — cross-check, but JSON wins on any disagreement per the handoff schema).
+## 2. Verify state before acting
 
-A handoff is commonly given as just `handoff.md` + `handoff.json` **without** the zip — this is a deliberate "light handoff" choice (see `context-handoff`'s SKILL.md), not a mistake, and it's a complete, usable handoff on its own. In that case:
-- Load and follow the two files exactly as normal.
-- Any `[file: uploaded]` / `[file: generated]` entries are records that a file existed, not files you have access to — note this plainly if the upcoming task would actually need that file's real content, and ask the user for the zip (or the file directly) at that point rather than proceeding as if the content were available.
-- If only a bare `.md` or `.json` was shared (not even the pair), work from what's available and note that the other wasn't provided.
+Run the handoff's `verify_first` commands (or its "how to check state" section). For each item marked
+*running* or *in progress*, find out what actually happened:
+- finished: the output exists;
+- died: there is an error, or the log stopped and there is no output;
+- still running.
 
-### 2. Read the usage-instructions preamble first, and actually follow it
+Note every difference from the handoff. **The disk wins.** Missing tools or skills on this account are listed
+as blockers, with what is needed to fix them.
 
-Before touching the transcript itself:
-- Treat the settled-decisions list as closed. Don't re-ask about or silently override anything on it.
-- Treat the open-questions list as genuinely open — surface these to the user early rather than guessing at them.
-- Note the coverage scope (full vs. partial, and from which turn). If coverage is partial, this changes how confidently you can speak about anything from before the capture starts — say so rather than implying full knowledge of the original conversation.
-- Note that any token counts in the file are estimates, not authoritative — don't restate them as exact figures.
+## 3. Respect settled vs open
 
-### 3. Internalize the transcript
+- Standing rules and `do_not_reopen` items are closed: follow them, don't re-ask.
+- Open questions are open: put them to the user early, with the handoff's context.
 
-Walk `turns` in order, reconstructing what happened using the block types (`thought`, `tool_call`, `tool_result`, `skill`, `answer`, `file`) in their recorded `order`. Files referenced under `assets/` are real — read them if the upcoming task needs their actual content, don't work from the filename alone.
+## 4. Confirm briefly, then go
 
-### 4. Confirm before proceeding
+Send one short message:
+- what was loaded (project, phase);
+- the verified state, highlighting anything that changed since the handoff (a job finished, a job failed);
+- the open questions;
+- the next step you will take.
 
-Give the user a short summary before starting any new work: how many turns were loaded, the coverage caveat in plain language, and the open-questions list. This is the checkpoint where a bad or corrupted handoff gets caught immediately instead of quietly propagating into new work. Something like:
-
-> Loaded the handoff — 14 turns, full coverage, generated Aug 14. Two open items carried over: [x], [y]. Ready to continue — want me to pick up on [y] first, or something else?
-
-Keep this brief; it's a confirmation, not a re-summary of the whole conversation back at the user.
-
-### 5. Proceed
-
-Once confirmed (or if the user just says "go ahead"), continue the work using the loaded context as if it were native conversation history — cite specifics from it naturally rather than re-deriving conclusions it already contains.
+Then do the next step unless the user redirects. This is a checkpoint, not a re-summary.
 
 ## Failure handling
 
-- **Malformed or partial file** (JSON doesn't parse, zip is missing expected members): say exactly what's broken and what you *could* still read, rather than silently working from a corrupted partial parse.
-- **JSON/Markdown disagreement**: follow JSON, but mention the discrepancy if it's substantive enough to matter for the task at hand.
-- **No usage-instructions block found** (e.g., a hand-edited or foreign-format file): don't assume the ground-truth/don't-relitigate rules apply — ask the user how much weight to give the file's contents instead of guessing.
+- Malformed JSON or a missing file: say exactly what is broken and work from what is readable.
+- HANDOFF.md and handoff.json disagree: check the disk; mention the difference if it matters.
+- Paths that don't exist on this machine: ask where the project lives now (it may have moved), then re-check.
+- No "settled"/"open" sections (a foreign or hand-written file): ask how much weight to give it rather than
+  treating it as authoritative.

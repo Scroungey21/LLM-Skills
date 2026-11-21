@@ -1,74 +1,125 @@
 ---
 name: context-handoff
-description: Exports the current conversation into a lossless, structured handoff package (Markdown + JSON + bundled files, zipped) so a new conversation — with Claude or any other AI — can continue with full, accurate context instead of a re-derived summary. Use this whenever the user asks to "export," "hand off," "save context," "continue this in a new chat," "summarize for a teammate," or wants to preserve/share this conversation before it's lost. Also proactively OFFER this (don't run it unasked) whenever a long_conversation_reminder appears, the conversation is clearly running very long, or the user mentions running low on context/usage — losing unsaved context is exactly the failure mode this skill exists to prevent, so err toward suggesting it. Trigger even if the user just says something like "I'm about to run out of space" or "I need to move this to a new chat."
+description: Writes a work-state handoff (HANDOFF.md + handoff.json) so another conversation, Claude account or AI can continue the same work. It covers what the work is, the user's standing rules, the style followed, tools and environment, which skills were used for what, the directory map, progress in the current phase, running jobs, next steps, open questions and traps, all checked against the files on disk. Use it when the user asks to "hand off", "export context", "write a handoff", "continue this in a new chat / another account", "brief a teammate" or "save where we are". Do not run or offer it just because a conversation is long or a context reminder appears. Offer it once only when the user says they are about to switch accounts or chats, or run out of usage.
 ---
 
-# Context Handoff
+# Context Handoff (work-state edition, v2)
 
-Turns the live conversation in Claude's own context window into a portable handoff package: a human/AI-readable Markdown transcript, a canonical JSON record, and a zip bundling any real files/images that were part of the conversation. The design goal is **losslessness within the bounds of what's actually still in context** — and total honesty about where those bounds are.
+A handoff exists so the next session can **continue the work correctly without the original conversation**.
+That means a curated, verified *state of the work*, not a replay of every turn. The receiver should be able to
+read it in a few minutes, run the "verify state" commands, and do the next step.
 
-Read `references/schema.md` before producing output — it defines the exact block grammar and JSON schema. Don't improvise a different structure.
+## Why v1 raised false alarms (and what v2 does instead)
 
-## Core principle: capture what's real, disclose what isn't
+| v1 behaviour | Effect | v2 rule |
+|---|---|---|
+| Offered itself on every long conversation or `long_conversation_reminder` | Nagging; offers when nothing was at risk (hosts that auto-compact keep working) | Never offer on length alone. Offer **once** only on a concrete signal (section 1). |
+| Declared earlier turns "not recoverable" because they had left the context window | Scary, usually wrong: the work lives on disk and many hosts keep a transcript file | Check the real sources first (section 3). Report a gap only for a **specific fact** you looked for and could not find. |
+| Made a verbatim turn-by-turn transcript the main output | Huge, slow to load, buries the decisions; the receiver re-derives state from chatter | The main output is a curated state document. A transcript appendix is optional. |
+| Copied in-context claims ("render running", "file written") as fact | The receiver acts on stale state | Verify every state claim with a cheap check, and mark what was not verified. |
+| Assumed the receiver has the same skills, memory and tools | The new account fails on missing skills | List every skill used, where it lives on disk and what it is for. The doc must be self-contained. |
 
-This skill runs *inside* a live conversation, so it can only ever see what's currently in context. It cannot recover turns that scrolled out of the window or were summarized away before this skill ran. That's a hard limit, not a bug — and the output must say so explicitly rather than presenting a partial capture as if it were complete. This honesty is the entire reason a companion browser-extension capture tool (external, DOM/network-level) is planned as a separate, later project: it exists specifically to cover conversations *after* this in-context method can no longer see the whole thing.
+## 1. When to run, when to offer
 
-## Workflow
+- **Run** when the user asks for a handoff, export, "continue elsewhere", a teammate brief or similar.
+- **Offer once** (one line, then drop it) only when the user says they are about to switch chat, account or
+  model, are almost out of usage, or are leaving the work for someone else.
+- **Never** offer because of message count, length, or a system "long conversation" reminder. Never repeat a
+  declined offer.
 
-### 1. Determine scope
+## 2. Ask nothing you can find
 
-Default to the entire conversation currently visible in context. If the user specifies a range ("just the last part," "from where we started X"), honor that instead. Either way, state the scope explicitly in the output.
+Work out the purpose from the request: continue the same work (default), onboard a teammate, or share with a
+team. Pick the output folder yourself: the project root the receiver will open, not a temp folder. Ask only if
+there is genuinely no project folder.
 
-### 2. Walk the conversation turn by turn, in order
+## 3. Gather from real sources, best first
 
-For each turn, extract, in the order they actually occurred:
+1. **Live state on disk:** project files, logs, ledgers, git status/log, output folders, running processes
+   (`tasklist`/`ps`), background-job output files.
+2. **Transcript files**, when the host keeps them:
+   - Claude Code: `~/.claude/projects/<project-slug>/<session-id>.jsonl` (grep it; it is large).
+   - Other hosts: whatever export or transcript the user can point to.
+3. **Compaction summaries** and what is still in context.
+4. **Memory files** (`MEMORY.md` + entries) and project instructions (`CLAUDE.md`, `SKILL.md` files).
 
-- The user's prompt (verbatim — don't paraphrase the user's own words).
-- Every distinct block of Claude's turn, tagged per `references/schema.md`'s block grammar: `[thought]`, `[tool_call: name]`, `[tool_result: name]`, `[skill: name]`, `[file: uploaded|generated]`, and the final `Answer:`.
-- Preserve the *actual order* blocks occurred in — don't group all tool calls together or all thoughts together if they were interleaved.
+Use a lower source only when a higher one does not have the fact. When sources disagree, the disk wins, and the
+handoff says so.
 
-If a block type is known to have happened (e.g., you know a tool was called) but its content isn't recoverable from context, still list it with a `[not visible in context]` note rather than silently omitting it — an acknowledged gap is far better than an invisible one.
+## 4. Verify before writing
 
-### 3. Bundle real files, don't just describe them
+For every state claim, run the cheapest check that proves it, then write the result:
+- *done*: the file exists or the log line is present;
+- *running*: the process is in the process list or the log is still growing;
+- *failed*: the error line;
+- *not verified*: say why.
 
-For every file mentioned in the conversation — user uploads, generated artifacts, images, downloaded outputs — copy the actual file into an `assets/` folder in the export (from `/mnt/user-data/uploads` and `/mnt/user-data/outputs` as appropriate) and reference it by relative path in the Markdown and JSON. Only fall back to a text description when the actual file genuinely isn't recoverable (e.g., it was never saved to disk). This is the direct equivalent of "image-based capture" from the original extension concept: prefer the real artifact over a text summary of it whenever one exists.
+Never write "running" or "complete" from memory alone. Paths in the document must exist; test them.
 
-### 4. Compute honest stats
+## 5. Write `HANDOFF.md` with these sections, in this order
 
-- Message counts (user turns, Claude turns) are exact.
-- Token counts are NOT exact — Claude has no access to real API token counts client-side. Compute a rough estimate (roughly `words × 1.3`) and label it clearly as an estimate, every time it appears. Never present an estimated number as if it were authoritative.
+Use the template in `references/schema.md`. Skip a section only when it truly does not apply, and write
+"none" rather than dropping it silently.
 
-### 5. Redact obvious secrets
+0. **Read this first:** instructions for the receiver:
+   - verify state before acting (point to section 9);
+   - settled items are closed, open items are open;
+   - where the full history is;
+   - which skills to install or read.
+1. **What the work is:** goal, audience, deliverables, in a few lines.
+2. **Standing rules:** everything the user insisted on, in their words where possible, grouped. These are
+   settled: the receiver must not re-ask them.
+3. **Style followed:** output style (format, tone, length, visuals) and how to work with this user (update
+   cadence, what they want asked vs decided, reporting honesty).
+4. **Environment and tools:** machine/OS, absolute paths of programs and venvs, CLIs, services, hardware limits,
+   and which assistant tools were used (and which were unavailable).
+5. **Skills used and for what:** a table of skill → purpose → where it lives on disk. Note that a new account
+   will not have them installed, and how to get them.
+6. **Directory map:** a tree of the relevant folders with one-line purposes.
+7. **How to run it:** the exact commands for each stage, copy-pasteable.
+8. **Progress:**
+   - finished earlier phases (one line each);
+   - a **current-phase status table**, one row per work item with a column per stage;
+   - notes per item: what exists, what was fixed, what is known to be wrong.
+9. **Running jobs and how to check state:** what was running at writing time and the commands to verify it now.
+10. **Next steps:** ordered and concrete, the first one runnable immediately.
+11. **Open questions:** decisions that belong to the user, each with the context needed to ask it well.
+12. **Changes made to tools, skills or shared code this session:** so the receiver knows they exist.
+13. **Where the full history is:** transcript paths, research files, logs.
+14. **Traps and lessons:** mistakes already made and fixed, so they are not repeated.
 
-Scan extracted text for common secret patterns (API key prefixes like `sk-`, `ghp_`, `AKIA`, bearer tokens, etc.) and replace matches with `[REDACTED: likely <type>]`. Report a count of redactions performed at the top of the output. This is a heuristic safety net, not a guarantee — say so.
+Keep it curated: facts, decisions, paths, commands. No chatter, no play-by-play. Typically 150–400 lines.
 
-### 6. Write the usage-instructions preamble
+## 6. Write `handoff.json`
 
-Every export starts with a preamble addressed directly to whatever AI reads the file next. Don't skip or shorten this — it's the difference between a handoff and a transcript dump. See `references/schema.md` for the exact required content (treat-as-ground-truth rule, don't-relitigate-settled-decisions rule, open-questions list, coverage caveat restated). Adjust its emphasis slightly by handoff purpose if the user states one (continuing the same task solo vs. onboarding a teammate vs. sharing across a project) — but never omit the core rules.
+This is the machine-readable twin (schema v2 in `references/schema.md`): `paths`, `settled_rules`, `skills`,
+`phase`, per-item status with `next`, `open_questions`, `do_not_reopen`, `verify_first` commands. It must agree
+with HANDOFF.md. If they diverge later, the receiver checks the disk.
 
-### 7. Assemble and package — always present all three separately
+## 7. Privacy and safety
 
-Write, in a working folder named after the conversation:
-- `handoff.md` — the full annotated transcript with the preamble at the top.
-- `handoff.json` — the canonical structured record (schema in `references/schema.md`). If the two ever disagree, JSON is the source of truth; say so in the Markdown.
-- `assets/` — bundled files from step 3.
+- No secrets: API keys, tokens, passwords, cookies. Redact any you find and say how many.
+- Personal data (email, phone, address) only if the user asked for it to be included. Usernames inside paths
+  are fine.
+- Do not paste large copyrighted text; point to the file.
 
-Then run `scripts/package_handoff.py <folder>` to zip everything into `<conversation-name>-handoff.zip`.
+## 8. Optional transcript appendix (only on request)
 
-**Present all three as separate, independently downloadable deliverables — never only the zip.** `handoff.md` and `handoff.json` together are a complete, self-sufficient handoff: a new conversation can be given just those two files and have everything needed to continue accurately (full transcript, structured data, settled decisions, open questions, coverage caveats). The zip is an *additional*, opt-in upgrade for when the user also wants the real bundled files/images for full lossless accuracy — not a requirement to make the handoff usable.
+If the user explicitly wants a verbatim record, add `transcript.md` built from the on-disk transcript file:
+user prompts verbatim, assistant answers, tool calls summarised. Follow the appendix grammar in
+`references/schema.md`. Never let it replace the state document.
 
-This gives the user a real choice at handoff time:
-- **Light handoff** (`handoff.md` + `handoff.json` only): smaller, faster to attach, conserves context in the new conversation — the right default when the original files/images aren't needed for the next task.
-- **Full handoff** (add the zip): needed when the next task actually requires the real files/images themselves, not just their record of having existed.
+## 9. Check, then deliver
 
-State this choice explicitly to the user when presenting the output — don't make them infer it from which files happen to be attached.
+Before delivering:
+- every path tested;
+- every "running" or "done" verified or marked *not verified*;
+- the first next step runnable;
+- open questions phrased as decisions;
+- no secrets;
+- the skills table complete.
 
-## Proactive offering
-
-When a `long_conversation_reminder` fires, or the conversation has clearly grown very long, or the user signals they're near a usage/context limit: mention, briefly and once, that you can generate a handoff export now while full context is still available, and ask if they'd like that. Don't repeat the offer if they decline. Don't run the export unprompted — only offer it.
-
-## What this skill does not do
-
-- It doesn't reach outside the current context window — no browser access, no re-fetching earlier deleted turns.
-- It doesn't guarantee tool-call inputs/outputs are complete if they were large and got truncated in context — flag truncation where you can detect it (e.g., an obviously cut-off block) rather than silently presenting truncated content as whole.
-- It doesn't replace the companion `context-resume` skill on the receiving end — that skill governs how the file should actually be *loaded*, this one only governs how it's *produced*.
+Then give the user the two files (and `scripts/package_handoff.py <folder>` to zip them, plus any small
+referenced files the receiver cannot reach). Tell them in one or two lines what to paste or attach in the new
+conversation: "attach HANDOFF.md and handoff.json and say 'continue from this handoff'". The receiving side is
+the `context-resume` skill.
